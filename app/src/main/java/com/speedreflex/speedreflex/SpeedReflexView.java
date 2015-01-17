@@ -1,5 +1,6 @@
 package com.speedreflex.speedreflex;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -12,6 +13,12 @@ import android.view.View;
  */
 public class SpeedReflexView extends SurfaceView implements View.OnClickListener,
         View.OnTouchListener, SurfaceHolder.Callback, Runnable {
+
+    public Activity parentActivity;
+
+
+
+
     public SpeedReflexView(Context context,AttributeSet attrs) {
         super(context, attrs);
     }
