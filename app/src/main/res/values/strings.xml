@@ -2,7 +2,12 @@
 <resources>
 
     <string name="app_name">SpeedReflex</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+
+    <string name="boutonJeuStart">JOUER</string>
+    <string name="bouttonQuitter">QUITTER</string>
+    <string name="bouttonSonOn">Son : ON</string>
+    <string name="bouttonScores">Scores</string>
+    <string name="bouttonSonOff">Son : OFF</string>
 
 </resources>
