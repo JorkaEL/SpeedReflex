@@ -14,13 +14,9 @@ public class SpeedReflexActivity extends Activity {
 
     SpeedReflexView srView;
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.speedreflex_game);
@@ -30,6 +26,11 @@ public class SpeedReflexActivity extends Activity {
         srView.parentActivity=this;
 
         srView.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
     @Override
