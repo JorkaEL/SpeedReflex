@@ -42,19 +42,19 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
     public SpeedReflexView(Context context,AttributeSet attrs) {
         super(context, attrs);
 
-        Log.i(">>> Projet", "IntelWorkOutView");
+        Log.i(">>> Projet", "SpeedReflexView");
 
         holder = getHolder();// Recuperation du Holder
         holder.addCallback(this);// Ajout
 
         speedReflexcontext = context;
-        Log.i(">>> Projet", "IntelWorkOutView 1 ");
+        Log.i(">>> Projet", "SpeedReflexView 1 ");
 
         speedReflexRes = speedReflexcontext.getResources();
-        Log.i(">>> loadimages", "IntelWorkOutView 2 ");
+        Log.i(">>> loadimages", "SpeedReflexView 2 ");
 
         loadimages(speedReflexRes);
-        Log.i(">>> Projet", "IntelWorkOutView 3 ");
+        Log.i(">>> Projet", "SpeedReflexView 3 ");
 
         //rd = new Random();
         cv_thread = new Thread(this);
