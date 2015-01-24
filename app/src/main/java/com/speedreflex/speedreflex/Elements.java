@@ -1,5 +1,7 @@
 package com.speedreflex.speedreflex;
 
+import android.graphics.Color;
+
 /**
  * Created by xavier on 17/01/15.
  */

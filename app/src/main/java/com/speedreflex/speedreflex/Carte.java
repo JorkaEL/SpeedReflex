@@ -10,6 +10,7 @@ public class Carte {
     public Elements premierElements;
     public Elements deuxiemeElements;
     public Elements bonElements;
+    public Boolean  use;
 
     private Bitmap imageCarte;
 
@@ -19,6 +20,7 @@ public class Carte {
         setDeuxiemeElements(deux);
         setPremierElements(un);
         setImageCarte(imageCarte);
+        setUse(false);
     }
 
     public Bitmap getImageCarte() {
@@ -37,6 +39,8 @@ public class Carte {
         return premierElements;
     }
 
+    public Boolean getUse(){return use; }
+
     public void setImageCarte(Bitmap imageCarte) {
         this.imageCarte = imageCarte;
     }
@@ -52,4 +56,6 @@ public class Carte {
     public void setPremierElements(Elements premierElements) {
         this.premierElements = premierElements;
     }
+
+    public void setUse(boolean use){this.use=use;}
 }
