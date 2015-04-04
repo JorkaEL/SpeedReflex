@@ -49,6 +49,9 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
     public int height;
     public int width;
 
+    public Carte tabRef;
+    public Carte tabJeu;
+
 
 
 
