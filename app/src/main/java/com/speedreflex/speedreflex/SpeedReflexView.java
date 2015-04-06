@@ -23,6 +23,7 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         View.OnTouchListener, SurfaceHolder.Callback, Runnable {
 
     public Activity parentActivity;
+    public boolean gameOver; // destiné a savoir si le jeu est fini
 
     public Elements voiture = new Elements(0,"Voiture", Color.rgb(255,0,0));
     public Elements ourse = new Elements(1,"Ourse", Color.rgb(88, 41, 0));
@@ -49,10 +50,15 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
     public int height;
     public int width;
 
-    public Carte tabRef;
-    public Carte tabJeu;
+    public Carte[] tabJeu ={}; // paquet de carte du jeu
+    public Carte   carteSelectioner; // contient la carte qui doit être affiché
 
+    public int carteAfficher; // emplacement de la carte à afficher
+    public int carteNombre; // nombre de carte dans le tableau
+    public int nbUse; // nombre de carte déjà trouvé
 
+    public int heightCarte;
+    public int widthCarte;
 
 
 
@@ -96,6 +102,11 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         width = getWidth();
 
         loadimages(speedReflexRes);
+        heightCarte = tabJeu[0].getImageCarte().getHeight();
+        widthCarte = tabJeu[0].getImageCarte().getWidth();
+        melangeCarte();
+
+        gameOver=false;
 
     }
 
@@ -103,6 +114,7 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         // Log.i("-> Fct <-", " dessin ");
         canvas.drawRGB(105, 105, 105);
         paintElement(canvas);
+        paintCarte(canvas);
     }
 
     public void paintElement(Canvas canvas){
@@ -111,6 +123,52 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         canvas.drawBitmap(bonbonB,voitureB.getWidth()*3 +10,height - voitureB.getHeight()*2, null);
         canvas.drawBitmap(lunetteB,voitureB.getWidth()*4 +15,height - voitureB.getHeight()*2, null);
         canvas.drawBitmap(telephoneB,voitureB.getWidth()*5 +20,height - voitureB.getHeight()*2, null);
+
+    }
+
+    public void paintCarte(Canvas canvas){
+        canvas.drawBitmap(carteSelectioner.getImageCarte(),widthCarte,heightCarte,null);
+    }
+
+
+    private Carte getCarteAfficher(int i) {
+
+        return tabJeu[i];
+
+    }
+
+    public void melangeCarte(){
+        int iNew;
+        Carte carTmp;
+
+        for (int i = 0; i < carteNombre; i++) {
+
+                carTmp = tabJeu[i];
+                rd = new Random();
+                iNew = rd.nextInt(carteNombre);
+                tabJeu[i] = tabJeu[iNew];
+                tabJeu[iNew] = carTmp;
+
+        }
+
+    }
+
+    public void choixCarte(){
+        int i;
+        nbUse = 0;
+
+        for (i=0;i<carteNombre;i++){
+            if(!tabJeu[i].use){
+                carteAfficher = i;
+                carteSelectioner = getCarteAfficher(carteAfficher);
+                break;
+            }
+            nbUse++;
+        }
+
+        if(nbUse == carteNombre -1){
+            gameOver=true;
+        }
 
     }
 
