@@ -50,7 +50,7 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
     public int height;
     public int width;
 
-    public Carte[] tabJeu ={}; // paquet de carte du jeu
+    public Carte[] tabJeu; // paquet de carte du jeu
     public Carte   carteSelectioner; // contient la carte qui doit être affiché
 
     public int carteAfficher; // emplacement de la carte à afficher
@@ -59,6 +59,10 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
 
     public int heightCarte;
     public int widthCarte;
+
+    /*endroit ou le joueur clique */
+    public float positionClickX;
+    public float positionClickY;
 
 
 
@@ -100,14 +104,23 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
 
         height = getHeight();
         width = getWidth();
+       carteNombre=1;
+        tabJeu = new Carte[carteNombre];
 
         loadimages(speedReflexRes);
+        initTabJeu();
         heightCarte = tabJeu[0].getImageCarte().getHeight();
         widthCarte = tabJeu[0].getImageCarte().getWidth();
         melangeCarte();
+        choixCarte();
 
         gameOver=false;
 
+    }
+
+    private void initTabJeu(){
+
+        tabJeu[0] = new Carte(voiture,ourse,lunette,voitureB);
     }
 
     private void dessin(Canvas canvas) {
@@ -158,7 +171,7 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         nbUse = 0;
 
         for (i=0;i<carteNombre;i++){
-            if(!tabJeu[i].use){
+            if(!tabJeu[i].getUse()){
                 carteAfficher = i;
                 carteSelectioner = getCarteAfficher(carteAfficher);
                 break;
@@ -194,6 +207,40 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
     @Override
     public void onClick(View v) {
 
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        // TODO Auto-generated method stub
+        // Log.d("onTouchEvent", "r�cup�ration de la position du doigt");
+        positionClickX = event.getX();// recuperation position X
+        positionClickY = event.getY();// recuperation position Y
+
+        switch (event.getAction()) {// Swtich sur le type d'action
+            case MotionEvent.ACTION_MOVE:
+                // System.out.println("ACTION_MOVE");
+
+                break;
+            case MotionEvent.ACTION_DOWN:
+                //System.out.println("ACTION_DOWN");
+                // Action lorsque le joueur touche l'ecran
+                if((positionClickX >= voitureB.getWidth() && positionClickX<(voitureB.getWidth()*6)) && (positionClickY >= (height-(voitureB.getHeight()*2)) && positionClickY<(height-voitureB.getHeight()) ) ){
+                    Log.i("-> Fct <-", " clic X "+positionClickX);
+                    Log.i("-> Fct <-", " clic Y "+positionClickY);
+                }
+
+
+                break;
+            case MotionEvent.ACTION_UP:
+                //System.out.println("ACTION_UP");
+                // RAZ des booleans
+
+                break;
+            default:
+                System.out.println();
+        }
+
+        return super.onTouchEvent(event);
     }
 
     @Override
