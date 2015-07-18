@@ -1,5 +1,6 @@
 package com.speedreflex.speedreflex;
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
 
 /**
@@ -8,12 +9,13 @@ import android.graphics.Color;
 public class Elements {
     public int id;
     public String forme;
-    public int couleur;
+    //public int couleur;
+    public Bitmap image;
 
-    public Elements(int id,String forme, int couleur){
+    public Elements(int id,String forme, Bitmap image){
         this.id=id;
         this.forme=forme;
-        this.couleur=couleur;
+        this.image=image;
     }
 
     public void setId(int id) {
@@ -24,16 +26,16 @@ public class Elements {
         this.forme = forme;
     }
 
-    public void setCouleur(int couleur) {
-        this.couleur = couleur;
+    public void setImage(Bitmap image) {
+        this.image = image;
     }
 
     public int getId(){
         return  id;
     }
 
-    public int getCouleur() {
-        return couleur;
+    public Bitmap getImage() {
+        return image;
     }
 
     public String getForme() {

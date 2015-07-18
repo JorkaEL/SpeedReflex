@@ -6,7 +6,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
+import android.text.format.Time;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -25,11 +25,15 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
     public Activity parentActivity;
     public boolean gameOver; // destiné a savoir si le jeu est fini
 
-    public Elements voiture = new Elements(0,"Voiture", Color.rgb(255,0,0));
-    public Elements ourse = new Elements(1,"Ourse", Color.rgb(88, 41, 0));
-    public Elements bonbon = new Elements(2,"Bonbon", Color.rgb(253, 108, 158));
-    public Elements lunette = new Elements(3,"Lunette", Color.rgb(0, 255, 0));
-    public Elements telephone = new Elements(4,"Telephone", Color.rgb(0, 0, 0));
+    //concerne le chrono
+    private Time iniTime = new Time();
+    private Time currentTime = new Time();
+    private int tempsJeu = 0;
+    private int minuteJeu = 0;
+    private int oldTempsJeu = 0;
+    private boolean first;
+    private String temps;
+
 
     private Bitmap voitureB;
     private Bitmap ourseB;
@@ -37,7 +41,15 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
     private Bitmap lunetteB;
     private Bitmap telephoneB;
 
-    //public  Elements tabEl []={voiture,ourse,bonbon,lunette,telephone};
+    public Elements voiture;
+    public Elements ourse;
+    public Elements bonbon;
+    public Elements lunette;
+    public Elements telephone;
+
+    public int nbElements=5;
+
+    public  Elements[] tabEl;//tableau des elements a choisir
 
     private Resources speedReflexRes;
     private Context speedReflexcontext;
@@ -107,7 +119,8 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
        carteNombre=1;
         tabJeu = new Carte[carteNombre];
 
-        loadimages(speedReflexRes);
+
+        iniTime.setToNow();
         initTabJeu();
         heightCarte = tabJeu[0].getImageCarte().getHeight();
         widthCarte = tabJeu[0].getImageCarte().getWidth();
@@ -120,7 +133,18 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
 
     private void initTabJeu(){
 
+        // partie element
+         voiture = new Elements(0,"Voiture", voitureB);
+         ourse = new Elements(1,"Ourse", ourseB);
+         bonbon = new Elements(2,"Bonbon", bonbonB);
+         lunette = new Elements(3,"Lunette",lunetteB);
+         telephone = new Elements(4,"Telephone",telephoneB);
+
+        tabEl= new Elements[]{voiture,ourse,bonbon,lunette,telephone};
+
+        //partie carte
         tabJeu[0] = new Carte(voiture,ourse,lunette,voitureB);
+
     }
 
     private void dessin(Canvas canvas) {
@@ -131,11 +155,25 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
     }
 
     public void paintElement(Canvas canvas){
-        canvas.drawBitmap(voitureB,voitureB.getWidth(),height - voitureB.getHeight()*2, null);
-        canvas.drawBitmap(ourseB,voitureB.getWidth()*2+5,height - voitureB.getHeight()*2, null);
-        canvas.drawBitmap(bonbonB,voitureB.getWidth()*3 +10,height - voitureB.getHeight()*2, null);
-        canvas.drawBitmap(lunetteB,voitureB.getWidth()*4 +15,height - voitureB.getHeight()*2, null);
-        canvas.drawBitmap(telephoneB,voitureB.getWidth()*5 +20,height - voitureB.getHeight()*2, null);
+        int i,w,h,n=1;
+        //Bitmap tmp;
+        w= tabEl[0].getImage().getWidth();
+        h= height - tabEl[0].getImage().getHeight()*2;
+        for(i=0;i<nbElements;i++){
+            //tmp=tabEl[i].getImage();
+            if(i==0){
+                canvas.drawBitmap(tabEl[i].getImage(),w/2*(n+i),h, null);
+            }else{
+                canvas.drawBitmap(tabEl[i].getImage(),w*(n+i)-w/2+5*i,h, null);
+            }
+
+        }
+
+        //canvas.drawBitmap(voitureB,voitureB.getWidth(),height - voitureB.getHeight()*2, null);
+        //canvas.drawBitmap(ourseB,voitureB.getWidth()*2+5,height - voitureB.getHeight()*2, null);
+        //canvas.drawBitmap(bonbonB,voitureB.getWidth()*3 +10,height - voitureB.getHeight()*2, null);
+        //canvas.drawBitmap(lunetteB,voitureB.getWidth()*4 +15,height - voitureB.getHeight()*2, null);
+        //canvas.drawBitmap(telephoneB,voitureB.getWidth()*5 +20,height - voitureB.getHeight()*2, null);
 
     }
 
