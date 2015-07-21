@@ -7,19 +7,17 @@ import android.graphics.Bitmap;
  */
 public class Carte {
 
-    public Elements premierElements;
-    public Elements deuxiemeElements;
+    //public Elements premierElements;
+    //public Elements deuxiemeElements;
     public Elements bonElements;
     public Boolean  use;
 
     private Bitmap imageCarte;
 
 
-    public Carte(Elements un, Elements deux, Elements trois, Bitmap imageCarte){
-        setBonElements(trois);
-        setDeuxiemeElements(deux);
-        setPremierElements(un);
-        setImageCarte(imageCarte);
+    public Carte( Elements bonElements, Bitmap imageCarte){
+        this.bonElements = bonElements;
+        this.imageCarte = imageCarte;
         setUse(false);
     }
 
@@ -31,13 +29,6 @@ public class Carte {
         return bonElements;
     }
 
-    public Elements getDeuxiemeElements() {
-        return deuxiemeElements;
-    }
-
-    public Elements getPremierElements() {
-        return premierElements;
-    }
 
     public Boolean getUse(){return use; }
 
@@ -49,13 +40,7 @@ public class Carte {
         this.bonElements = bonElements;
     }
 
-    public void setDeuxiemeElements(Elements deuxiemeElements) {
-        this.deuxiemeElements = deuxiemeElements;
+    public void setUse(boolean use){
+        this.use=use;
     }
-
-    public void setPremierElements(Elements premierElements) {
-        this.premierElements = premierElements;
-    }
-
-    public void setUse(boolean use){this.use=use;}
 }

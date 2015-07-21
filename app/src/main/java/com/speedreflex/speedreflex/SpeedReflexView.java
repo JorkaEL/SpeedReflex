@@ -6,6 +6,8 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.text.format.Time;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -48,6 +50,10 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
     public Elements telephone;
 
     public int nbElements=5;
+    public int elementSelectione;
+
+    public int heightElement;
+    public int widthElement;
 
     public  Elements[] tabEl;//tableau des elements a choisir
 
@@ -61,6 +67,29 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
 
     public int height;
     public int width;
+
+    //concerne les Cartes
+    private Bitmap carte1;
+    private Bitmap carte2;
+    private Bitmap carte3;
+    private Bitmap carte4;
+    private Bitmap carte5;
+    private Bitmap carte6;
+    private Bitmap carte7;
+    private Bitmap carte8;
+    private Bitmap carte9;
+    private Bitmap carte10;
+    private Bitmap carte11;
+    private Bitmap carte12;
+    private Bitmap carte13;
+    private Bitmap carte14;
+    private Bitmap carte15;
+    private Bitmap carte16;
+    private Bitmap carte17;
+    private Bitmap carte18;
+    private Bitmap carte19;
+    private Bitmap carte20;
+
 
     public Carte[] tabJeu; // paquet de carte du jeu
     public Carte   carteSelectioner; // contient la carte qui doit être affiché
@@ -104,11 +133,16 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
     }
 
     private void loadimages(Resources speedReflexRes) {
+        //image des elements
         voitureB = BitmapFactory.decodeResource(speedReflexRes, R.drawable.voiture);
         ourseB = BitmapFactory.decodeResource(speedReflexRes, R.drawable.ourson);
         bonbonB = BitmapFactory.decodeResource(speedReflexRes, R.drawable.bonbon);
         lunetteB = BitmapFactory.decodeResource(speedReflexRes, R.drawable.lunette);
         telephoneB = BitmapFactory.decodeResource(speedReflexRes, R.drawable.telephone);
+
+        //image des Cartes
+        carte1 = BitmapFactory.decodeResource(speedReflexRes, R.drawable.testcarte);
+
     }
 
     public void initparameters() {
@@ -124,8 +158,13 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         initTabJeu();
         heightCarte = tabJeu[0].getImageCarte().getHeight();
         widthCarte = tabJeu[0].getImageCarte().getWidth();
+        heightElement = tabEl[0].getImage().getHeight();
+        widthElement =  tabEl[0].getImage().getWidth();
         melangeCarte();
         choixCarte();
+        elementSelectione=-1;
+        Log.i("-> Fct <-", " Element = "+elementSelectione);
+
 
         gameOver=false;
 
@@ -143,7 +182,7 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         tabEl= new Elements[]{voiture,ourse,bonbon,lunette,telephone};
 
         //partie carte
-        tabJeu[0] = new Carte(voiture,ourse,lunette,voitureB);
+        tabJeu[0] = new Carte(lunette,carte1);
 
     }
 
@@ -152,19 +191,20 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         canvas.drawRGB(105, 105, 105);
         paintElement(canvas);
         paintCarte(canvas);
+        paintScore(canvas);
     }
 
     public void paintElement(Canvas canvas){
         int i,w,h,n=1;
         //Bitmap tmp;
-        w= tabEl[0].getImage().getWidth();
+        //w= tabEl[0].getImage().getWidth();
         h= height - tabEl[0].getImage().getHeight()*2;
         for(i=0;i<nbElements;i++){
             //tmp=tabEl[i].getImage();
             if(i==0){
-                canvas.drawBitmap(tabEl[i].getImage(),w/2*(n+i),h, null);
+                canvas.drawBitmap(tabEl[i].getImage(),widthElement*(n+i),h, null);
             }else{
-                canvas.drawBitmap(tabEl[i].getImage(),w*(n+i)-w/2+5*i,h, null);
+                canvas.drawBitmap(tabEl[i].getImage(),widthElement*(n+i)+5*i,h, null);
             }
 
         }
@@ -178,7 +218,15 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
     }
 
     public void paintCarte(Canvas canvas){
-        canvas.drawBitmap(carteSelectioner.getImageCarte(),widthCarte,heightCarte,null);
+        canvas.drawBitmap(carteSelectioner.getImageCarte(), widthElement*2, heightCarte-70, null);
+    }
+
+    private void paintScore(Canvas canvas) {
+        Paint paint = new Paint();
+        paint.setColor(Color.BLACK);
+        paint.setTextSize(widthElement);
+        canvas.drawText(temps, getWidth() / 3, width / 3, paint);
+
     }
 
 
@@ -253,7 +301,7 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         // Log.d("onTouchEvent", "r�cup�ration de la position du doigt");
         positionClickX = event.getX();// recuperation position X
         positionClickY = event.getY();// recuperation position Y
-
+        int i;
         switch (event.getAction()) {// Swtich sur le type d'action
             case MotionEvent.ACTION_MOVE:
                 // System.out.println("ACTION_MOVE");
@@ -262,9 +310,18 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
             case MotionEvent.ACTION_DOWN:
                 //System.out.println("ACTION_DOWN");
                 // Action lorsque le joueur touche l'ecran
-                if((positionClickX >= voitureB.getWidth() && positionClickX<(voitureB.getWidth()*6)) && (positionClickY >= (height-(voitureB.getHeight()*2)) && positionClickY<(height-voitureB.getHeight()) ) ){
+                if((positionClickX >= voitureB.getWidth() && positionClickX<(voitureB.getWidth()*6+5*(nbElements-1))) && (positionClickY >= (height-(voitureB.getHeight()*2)) && positionClickY<(height-voitureB.getHeight()) ) ){
                     Log.i("-> Fct <-", " clic X "+positionClickX);
                     Log.i("-> Fct <-", " clic Y "+positionClickY);
+                    for(i=0;i<nbElements;i++){
+                        if((positionClickX >= voitureB.getWidth()*(i+1) && positionClickX < voitureB.getWidth()*(i+2)+5*(nbElements-1)) &&(positionClickY >= (height-(voitureB.getHeight()*2)) && positionClickY<(height-voitureB.getHeight()) )){
+                            Log.i("-> Fct <-", " i = "+i);
+                            elementSelectione=i;
+                        }
+                        else {
+                            elementSelectione=-1;
+                        }
+                    }
                 }
 
 
@@ -291,6 +348,7 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         Log.i("-> Fct <-", " run ");
         Canvas c = null;
         while (in) {
+            tempsEcoule();
             try {
                 cv_thread.sleep(40);
                 try {
@@ -316,6 +374,62 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
     public void setThread(boolean etat){
         this.in=etat;
 
+    }
+
+    private void tempsEcoule() {
+
+        if (!gameOver) {
+            currentTime.setToNow();
+            if (currentTime.second >= iniTime.second) {
+                tempsJeu = (currentTime.second - iniTime.second);
+                tempsJeu += oldTempsJeu;
+                if (tempsJeu >= 21) {
+                    tempsJeu -= 21;
+
+                } else {
+                    if (tempsJeu != 20)
+                        first = true;
+                }
+                if (tempsJeu < 10) {
+                    first = true;
+
+                    temps = "0" + tempsJeu;
+                } else {
+                    //if (first) {
+
+                        temps = "" + tempsJeu;
+                    //}
+                    if (tempsJeu == 20 && first) {
+                        first = false;
+                    }
+                }
+
+            } else {
+                Log.i("Fct chrono","current < init");
+                tempsJeu = ((currentTime.second + 21) - iniTime.second);
+                tempsJeu += oldTempsJeu;
+                if (tempsJeu >= 21) {
+                    tempsJeu -= 21;
+                } else {
+                    if (tempsJeu != 20)
+                        first = true;
+                }
+                if (tempsJeu < 10) {
+                    first = true;
+
+                    temps = "0" + tempsJeu;
+                } else {
+                    //if (first) {
+
+                        temps = "" + tempsJeu;
+                    //}
+                    if (tempsJeu == 20 && first) {
+
+                        first = false;
+                    }
+                }
+            }
+        }
     }
 
 }
