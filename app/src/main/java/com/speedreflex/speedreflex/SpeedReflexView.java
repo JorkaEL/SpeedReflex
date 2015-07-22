@@ -30,8 +30,9 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
     //concerne le chrono
     private Time iniTime = new Time();
     private Time currentTime = new Time();
+    private  Time preCurrentTime = new Time();
     private int tempsJeu = 0;
-    private int minuteJeu = 0;
+    private int preTempsJeu = 0;
     private int oldTempsJeu = 0;
     private boolean first;
     private String temps;
@@ -154,7 +155,8 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         tabJeu = new Carte[carteNombre];
 
 
-        iniTime.setToNow();
+        //iniTime.setToNow();
+        preCurrentTime.setToNow();
         initTabJeu();
         heightCarte = tabJeu[0].getImageCarte().getHeight();
         widthCarte = tabJeu[0].getImageCarte().getWidth();
@@ -223,9 +225,18 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
 
     private void paintScore(Canvas canvas) {
         Paint paint = new Paint();
-        paint.setColor(Color.BLACK);
-        paint.setTextSize(widthElement);
-        canvas.drawText(temps, getWidth() / 3, width / 3, paint);
+        if(tempsJeu<=10){
+            paint.setColor(Color.GREEN);
+        }
+        else if(tempsJeu>=11 && tempsJeu <=15){
+            paint.setColor(Color.YELLOW);
+        }
+        else if(tempsJeu>=16){
+            paint.setColor(Color.RED);
+        }
+        //paint.setColor(Color.BLACK);
+        paint.setTextSize(widthCarte/2);
+        canvas.drawText(temps, widthElement*2+widthElement/2, width/3, paint);
 
     }
 
@@ -380,56 +391,120 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
 
         if (!gameOver) {
             currentTime.setToNow();
-            if (currentTime.second >= iniTime.second) {
-                tempsJeu = (currentTime.second - iniTime.second);
-                tempsJeu += oldTempsJeu;
-                if (tempsJeu >= 21) {
-                    tempsJeu -= 21;
+            if (preCurrentTime.second != currentTime.second){
 
-                } else {
-                    if (tempsJeu != 20)
-                        first = true;
+                if(tempsJeu == 20){
+                    tempsJeu=0;
                 }
+                else{
+                    tempsJeu++;
+                }
+
+                preCurrentTime.second = currentTime.second;
+            }
+
+            if (tempsJeu < 10) {
+
+                temps = "0" + tempsJeu;
+            } else {
+
+                temps = "" + tempsJeu;
+            }
+
+
+
+        }
+    }
+
+
+
+    // ancienne fonction temps Ecouler
+    /*private void tempsEcoule() {
+
+        if (!gameOver) {
+            currentTime.setToNow();
+            Log.i("curentTime", ": " + currentTime.second);
+            preTempsJeu =tempsJeu;
+
+            if(preTempsJeu ==20 && preCurrentTime.second ==59){
+                preCurrentTime.second =0;
+            }
+
+            Log.i("preCurrentTime",": "+preCurrentTime.second);
+
+           if (currentTime.second > iniTime.second || (preCurrentTime.second == 59) ) {
+
+                if(preCurrentTime.second == 59 && currentTime.second <=iniTime.second){
+                    if(currentTime.second == 0){
+                        tempsJeu = (59 +currentTime.second+1) - iniTime.second;
+                    }else {
+                        tempsJeu = (59 +currentTime.second) - iniTime.second;
+                   }
+                }
+                else {
+                    tempsJeu = (currentTime.second - iniTime.second);
+                }
+                tempsJeu += oldTempsJeu;
+                //Log.i("Fct","tempsJeu : "+tempsJeu);
+                if(tempsJeu >= 63){
+                    tempsJeu -= 63;
+                   // Log.i("Fct","tempsJeu : -63 ");
+                }
+                else if(tempsJeu >= 42) {
+                    tempsJeu -= 42;
+                   // Log.i("Fct","tempsJeu : -42 ");
+                }
+                else if (tempsJeu >= 21) {
+                    tempsJeu -= 21;
+                   // Log.i("Fct","tempsJeu : -21 ");
+
+                }
+
                 if (tempsJeu < 10) {
-                    first = true;
 
                     temps = "0" + tempsJeu;
                 } else {
-                    //if (first) {
 
-                        temps = "" + tempsJeu;
-                    //}
-                    if (tempsJeu == 20 && first) {
-                        first = false;
-                    }
+                    temps = "" + tempsJeu;
                 }
+
+                preTempsJeu =tempsJeu;
+
+                if(currentTime.second==59){
+                    preCurrentTime.second=59;
+                }
+
 
             } else {
-                Log.i("Fct chrono","current < init");
-                tempsJeu = ((currentTime.second + 21) - iniTime.second);
+                //Log.i("Fct chrono","current < init");
+
+                tempsJeu = ((currentTime.second + 63) - iniTime.second);//( iniTime.second - currentTime.second);//((currentTime.second + 21) - iniTime.second);
+                //Log.i("Fct","tempsJeu : "+tempsJeu);
                 tempsJeu += oldTempsJeu;
-                if (tempsJeu >= 21) {
-                    tempsJeu -= 21;
-                } else {
-                    if (tempsJeu != 20)
-                        first = true;
+                if(tempsJeu >= 63){
+                    tempsJeu -= 63;
+                   // Log.i("Fct","tempsJeu : -63 ");
                 }
+                else if(tempsJeu >= 42) {
+                    tempsJeu -= 42;
+                   // Log.i("Fct","tempsJeu : -42 ");
+                }
+                else if (tempsJeu >= 21) {
+                    tempsJeu -= 21;
+                    //Log.i("Fct","tempsJeu : -21 ");
+                }
+
                 if (tempsJeu < 10) {
-                    first = true;
+
 
                     temps = "0" + tempsJeu;
                 } else {
-                    //if (first) {
 
-                        temps = "" + tempsJeu;
-                    //}
-                    if (tempsJeu == 20 && first) {
+                    temps = "" + tempsJeu;
 
-                        first = false;
-                    }
                 }
             }
         }
-    }
+    }*/
 
 }
