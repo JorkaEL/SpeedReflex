@@ -28,13 +28,9 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
     public boolean gameOver; // destiné a savoir si le jeu est fini
 
     //concerne le chrono
-    private Time iniTime = new Time();
     private Time currentTime = new Time();
     private  Time preCurrentTime = new Time();
     private int tempsJeu = 0;
-    private int preTempsJeu = 0;
-    private int oldTempsJeu = 0;
-    private boolean first;
     private String temps;
 
 
@@ -57,6 +53,8 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
     public int widthElement;
 
     public  Elements[] tabEl;//tableau des elements a choisir
+
+    private boolean choixDuJoueur;
 
     private Resources speedReflexRes;
     private Context speedReflexcontext;
@@ -282,6 +280,15 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
 
     }
 
+    public boolean choixJoueur(){
+        if(tabEl[elementSelectione].getId() == carteSelectioner.getBonElements().getId()){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
@@ -328,6 +335,8 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
                         if((positionClickX >= voitureB.getWidth()*(i+1) && positionClickX < voitureB.getWidth()*(i+2)+5*(nbElements-1)) &&(positionClickY >= (height-(voitureB.getHeight()*2)) && positionClickY<(height-voitureB.getHeight()) )){
                             Log.i("-> Fct <-", " i = "+i);
                             elementSelectione=i;
+                            choixDuJoueur=choixJoueur();
+                            Log.i("TestchoixJoueur",": "+choixDuJoueur);
                         }
                         else {
                             elementSelectione=-1;
