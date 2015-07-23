@@ -9,5 +9,9 @@
     <string name="bouttonSonOn">Son : ON</string>
     <string name="bouttonScores">Scores</string>
     <string name="bouttonSonOff">Son : OFF</string>
+    <string name="bouttonDificulteF">Dificulter : FACILE</string>
+    <string name="bouttonDificulteN">Dificulter : NORMAL</string>
+    <string name="bouttonDificulteD">Dificulter : DIFFICILE</string>
+
 
 </resources>

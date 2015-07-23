@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 
@@ -13,6 +14,7 @@ import android.view.Window;
 public class SpeedReflexActivity extends Activity {
 
     SpeedReflexView srView;
+    public int difficulter;
 
 
     @Override
@@ -22,8 +24,14 @@ public class SpeedReflexActivity extends Activity {
         setContentView(R.layout.speedreflex_game);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        Bundle niveau= this.getIntent().getExtras();
+        difficulter=niveau.getInt("difficulter");
+
         srView=(SpeedReflexView)findViewById(R.id.SpeedReflexView);
         srView.parentActivity=this;
+        Log.i("avt set difficulter:"," "+difficulter);
+        srView.setDificulter(difficulter);
+        //Log.i("apres set difficulter:", " " + difficulter);
 
         srView.setVisibility(View.VISIBLE);
     }

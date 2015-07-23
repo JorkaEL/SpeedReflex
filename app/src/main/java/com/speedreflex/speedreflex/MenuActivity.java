@@ -3,6 +3,7 @@ package com.speedreflex.speedreflex;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,17 +13,25 @@ import android.widget.Button;
 public class MenuActivity extends Activity {
 
     Intent intentVar;
+    SpeedReflexView speedDif;
+    public int testdifficulter = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_menu);
         intentVar = new Intent(this, SpeedReflexActivity.class);
+        intentVar.putExtra("difficulter",testdifficulter);
 
         Button btnStart = (Button) findViewById(R.id.buttonStart);
+        Button btnQuitter = (Button) findViewById(R.id.buttonQuit);
+        Button btnDificulter = (Button) findViewById(R.id.buttonDifficulte);
 
-
+        btnQuitter.setOnClickListener(new ButtonQuitClickListener());
         btnStart.setOnClickListener(new ButtonStartClickListener(btnStart));
+        btnDificulter.setOnClickListener(new ButtonDifficulteClickListener(btnDificulter));
+
     }
 
 
@@ -59,5 +68,45 @@ public class MenuActivity extends Activity {
         public void onClick(View v) {
             startActivity(intentVar);
         }
+    };
+
+    class ButtonQuitClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            finish();
+        }
+    };
+
+    class ButtonDifficulteClickListener implements View.OnClickListener {
+        Button btn;
+
+        ButtonDifficulteClickListener(Button button) {
+            this.btn = button;
+        }
+
+        @Override
+        public void onClick(View v) {
+            Log.i("bouton difficulter"," : "+testdifficulter);
+            if(testdifficulter<2){
+                testdifficulter++;
+            }else{
+                testdifficulter=0;
+            }
+            Log.i("bouton difficulter"," : "+testdifficulter);
+
+            if (testdifficulter == 0) {
+                btn.setText(R.string.bouttonDificulteF);
+                intentVar.putExtra("difficulter", testdifficulter);
+
+            } else if(testdifficulter == 1) {
+                btn.setText(R.string.bouttonDificulteN);
+                intentVar.putExtra("difficulter", testdifficulter);
+
+            } else if(testdifficulter == 2) {
+                btn.setText(R.string.bouttonDificulteD);
+                intentVar.putExtra("difficulter",testdifficulter);
+            }
+        }
+
     };
 }
