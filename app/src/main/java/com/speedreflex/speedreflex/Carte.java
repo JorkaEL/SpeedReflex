@@ -11,15 +11,18 @@ public class Carte {
     //public Elements deuxiemeElements;
     public Elements bonElements;
     public Boolean  use;
+    public int idCarte;
 
     private Bitmap imageCarte;
 
 
-    public Carte( Elements bonElements, Bitmap imageCarte){
+    public Carte( Elements bonElements, Bitmap imageCarte,int idCarte){
         this.bonElements = bonElements;
         this.imageCarte = imageCarte;
+        this.idCarte=idCarte;
         setUse(false);
     }
+
 
     public Bitmap getImageCarte() {
         return imageCarte;
@@ -29,8 +32,10 @@ public class Carte {
         return bonElements;
     }
 
+    public int getIdCarte(){return idCarte;}
 
     public Boolean getUse(){return use; }
+
 
     public void setImageCarte(Bitmap imageCarte) {
         this.imageCarte = imageCarte;
@@ -39,6 +44,8 @@ public class Carte {
     public void setBonElements(Elements bonElements) {
         this.bonElements = bonElements;
     }
+
+    public void setIdCarte(int idCarte){this.idCarte=idCarte;}
 
     public void setUse(boolean use){
         this.use=use;

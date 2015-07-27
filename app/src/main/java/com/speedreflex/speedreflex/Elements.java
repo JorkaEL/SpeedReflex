@@ -18,6 +18,12 @@ public class Elements {
         this.image=image;
     }
 
+    public Elements(){
+        this.id=-1;
+        this.forme="null";
+        this.image= null;
+    }
+
     public void setId(int id) {
         this.id = id;
     }
@@ -40,5 +46,11 @@ public class Elements {
 
     public String getForme() {
         return forme;
+    }
+
+    public void setElement(Elements element){
+        this.id=element.getId();
+        this.forme=element.getForme();
+        this.image=element.getImage();
     }
 }

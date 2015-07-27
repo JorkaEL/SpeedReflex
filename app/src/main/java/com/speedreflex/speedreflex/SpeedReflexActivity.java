@@ -1,6 +1,8 @@
 package com.speedreflex.speedreflex;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -49,15 +51,24 @@ public class SpeedReflexActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        srView.initparameters();
+        srView.setThread(true);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        //srView.deleteSave();
+        srView.saveGame();
+        srView.setThread(false);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        //srView.deleteSave();
     }
+
+
+
 }

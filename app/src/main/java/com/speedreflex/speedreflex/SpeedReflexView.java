@@ -1,13 +1,20 @@
 package com.speedreflex.speedreflex;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.Html;
 import android.text.format.Time;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -15,8 +22,11 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.Random;
+import java.util.StringTokenizer;
 import java.util.logging.LogRecord;
 
 /**
@@ -26,12 +36,15 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         View.OnTouchListener, SurfaceHolder.Callback, Runnable {
 
     public Activity parentActivity;
+    Intent intentDataPlayer = null;
     public boolean gameOver; // destiné a savoir si le jeu est fini
+    MotionEvent event2 = null;
 
     //concerne le chrono
     private Time currentTime = new Time();
     private  Time preCurrentTime = new Time();
     private int tempsJeu = 0;
+    private int oldTempsJeu;
     private int tempsDispo;
     private String temps;
 
@@ -163,22 +176,13 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
 
         tabJeu = new Carte[carteNombre];
 
+        // partie element
+        voiture = new Elements(0,"Voiture", voitureB);
+        ourse = new Elements(1,"Ourse", ourseB);
+        bonbon = new Elements(2,"Bonbon", bonbonB);
+        lunette = new Elements(3,"Lunette",lunetteB);
+        telephone = new Elements(4,"Telephone",telephoneB);
 
-        //iniTime.setToNow();
-        preCurrentTime.setToNow();
-        initTabJeu();
-        heightCarte = tabJeu[0].getImageCarte().getHeight();
-        widthCarte = tabJeu[0].getImageCarte().getWidth();
-        heightElement = tabEl[0].getImage().getHeight();
-        widthElement =  tabEl[0].getImage().getWidth();
-        melangeCarte();
-        carteAfficher=0;
-        choixCarte();
-        elementSelectione=-1;
-        //Log.i("Dificulter"," : "+difficulter);
-        //Log.i("-> Fct <-", " Element = "+elementSelectione);
-
-        score=0;
         if(difficulter==0) {
             tempsDispo = 20;
         }else if(difficulter==1){
@@ -188,24 +192,62 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         }
 
 
+        if(loadExist()){
+            tabEl=new Elements[nbElements];
+            loadGame();
+            tempsJeu=oldTempsJeu;
+            elementSelectione=-1;
+            //Log.i("CarteAfficher"," "+carteAfficher);
+            //carteAfficher=0;
+
+        }
+        else{
+            preCurrentTime.setToNow();
+            initTabJeu();
+            melangeCarte();
+            melangerElements();
+            carteAfficher=0;
+            choixCarte();
+            elementSelectione=-1;
+            tempsJeu=tempsDispo;
+
+            score=0;
+        }
+
+        //iniTime.setToNow();
+       // preCurrentTime.setToNow();
+
+        //initTabJeu();
+        heightCarte = tabJeu[0].getImageCarte().getHeight();
+        widthCarte = tabJeu[0].getImageCarte().getWidth();
+        heightElement = tabEl[0].getImage().getHeight();
+        widthElement =  tabEl[0].getImage().getWidth();
+       // melangeCarte();
+        //carteAfficher=0;
+        //choixCarte();
+        //elementSelectione=-1;
+        //Log.i("Dificulter"," : "+difficulter);
+        //Log.i("-> Fct <-", " Element = "+elementSelectione);
+
+        //score=0;
+
+        //tempsJeu=oldtempsJeu;
+        //saveGame();
+        //loadGame();
+
         gameOver=false;
 
     }
 
     private void initTabJeu(){
 
-        // partie element
-         voiture = new Elements(0,"Voiture", voitureB);
-         ourse = new Elements(1,"Ourse", ourseB);
-         bonbon = new Elements(2,"Bonbon", bonbonB);
-         lunette = new Elements(3,"Lunette",lunetteB);
-         telephone = new Elements(4,"Telephone",telephoneB);
+
 
         tabEl= new Elements[]{voiture,ourse,bonbon,lunette,telephone};
 
         //partie carte
-        tabJeu[0] = new Carte(lunette,carte1);
-        tabJeu[1] = new Carte(voiture,carte2);
+        tabJeu[0] = new Carte(lunette,carte1,1);
+        tabJeu[1] = new Carte(voiture, carte2,2);
 
     }
 
@@ -235,35 +277,41 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
     }
 
     public void paintCarte(Canvas canvas){
-        canvas.drawBitmap(carteSelectioner.getImageCarte(), widthElement * 2, heightCarte-70, null);
+        canvas.drawBitmap(carteSelectioner.getImageCarte(), widthElement * 2, heightCarte - 70, null);
     }
 
     private void paintTemps(Canvas canvas) {
         Paint paint = new Paint();
 
         if(difficulter==0) {
-            if (tempsJeu <= 10) {
+            if (tempsJeu >= 10) {
                 paint.setColor(Color.GREEN);
-            } else if (tempsJeu >= 11 && tempsJeu <= 15) {
+            } else if (tempsJeu >= 5 && tempsJeu <= 9) {
                 paint.setColor(Color.YELLOW);
-            } else if (tempsJeu >= 16) {
+            } else if (tempsJeu <= 4) {
+                paint.setColor(Color.RED);
+            }else{
                 paint.setColor(Color.RED);
             }
         }
         else if(difficulter==1){
-            if (tempsJeu <= 6) {
+            if (tempsJeu >= 10) {
                 paint.setColor(Color.GREEN);
-            } else if (tempsJeu >= 7 && tempsJeu <= 12) {
+            } else if (tempsJeu >= 6 && tempsJeu <= 9) {
                 paint.setColor(Color.YELLOW);
-            } else if (tempsJeu >= 13) {
+            } else if (tempsJeu <= 5) {
+                paint.setColor(Color.RED);
+            }else{
                 paint.setColor(Color.RED);
             }
         }else{
-            if (tempsJeu <= 3) {
+            if (tempsJeu >= 8) {
                 paint.setColor(Color.GREEN);
-            } else if (tempsJeu >= 4 && tempsJeu <= 7) {
+            } else if (tempsJeu >= 5 && tempsJeu <= 7) {
                 paint.setColor(Color.YELLOW);
-            } else if (tempsJeu >= 8) {
+            } else if (tempsJeu <= 4) {
+                paint.setColor(Color.RED);
+            }else{
                 paint.setColor(Color.RED);
             }
         }
@@ -297,8 +345,9 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
     }
 
     public void choixCarte(){
-        int i;
-        nbUse = 0;
+        int i,ancienneCarte;
+        //nbUse = 0;
+        boolean boucle2=false, fingame=false;
         //melangeCarte();
 
         if(carteAfficher==carteNombre-1){
@@ -306,20 +355,170 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         }else{
             i=carteAfficher+1;
         }
-
+        ancienneCarte=carteAfficher;
         for (;i<carteNombre;i++){
             if(!tabJeu[i].getUse()){
                 carteAfficher = i;
                 carteSelectioner = getCarteAfficher(carteAfficher);
+                boucle2=false;
                 break;
+            }else{
+                boucle2=true;
             }
-            nbUse++;
+            //nbUse++;
         }
 
-        if(nbUse == carteNombre -1){
+        if(boucle2) {
+            for (int j = 0; j<carteAfficher;j++){
+                if(!tabJeu[j].getUse()){
+                    carteAfficher = j;
+                    carteSelectioner = getCarteAfficher(carteAfficher);
+                    fingame=false;
+                    break;
+                }else{
+                    fingame=true;
+                }
+            }
+
+        }
+
+
+        if(fingame || ancienneCarte==carteAfficher ){
             gameOver=true;
+            finGame();
+            //in=false;
         }
 
+    }
+
+    public void finGame2(){
+        //Log.i("FinGame","gameOver = "+gameOver);
+        if(gameOver){
+            Log.i("FinGame", "gameOver = " + gameOver);
+            //in=false;
+            AlertDialog.Builder messVictory = new AlertDialog.Builder(
+                    speedReflexcontext);
+
+            messVictory.setTitle(R.string.TitreBtnAPropos);
+
+            messVictory.setIcon(R.drawable.ic_about);
+
+            TextView txtViewQts = new TextView(speedReflexcontext);
+            Log.i("FinGame"," cree textView ");
+
+            txtViewQts.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT));
+            txtViewQts.setPadding(20, 10, 20, 10);
+            txtViewQts.setTextSize(20);
+            txtViewQts
+                    .setText(Html
+                            .fromHtml("<center><small>Victoire</small></center>"
+                                    + "<br>"
+                                    + "<br>"
+                                    + "<center><b>Vous avez gagne ! Felicitation</b></center><br>"
+                                    + "<br>"
+                                    + "<small>Voulez vous sauvegarder votre temps</small><br>"));
+            messVictory.setView(txtViewQts);
+
+            messVictory.setPositiveButton("Oui",
+                    new android.content.DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            in = false;
+                            /*try {
+                                intentDataPlayer.putExtra("TEMPS", temps);
+                                intentDataPlayer.putExtra("MATRICE", matriceJeu);
+                                parentActivity.startActivity(intentDataPlayer);
+                            } catch (Exception e) {
+                                Log.i("Launch Activity fail", e.toString());
+                            }*/
+
+                            parentActivity.finish();
+
+                        }
+                    });
+            messVictory.setNegativeButton("Non",
+                    new android.content.DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            in = false;
+                            parentActivity.finish();
+
+                        }
+                    });
+            messVictory.setOnCancelListener(new android.content.DialogInterface.OnCancelListener() {
+
+                @Override
+                public void onCancel(DialogInterface dialog) {
+
+                }
+            });
+            messVictory.show();
+
+        }
+    }
+
+    public void finGame(){
+        //Log.i("FinGame","gameOver = "+gameOver);
+        //if(gameOver){
+            Log.i("FinGame", "gameOver = " + gameOver);
+            //in=false;
+
+
+
+
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                AlertDialog.Builder messVictory = new AlertDialog.Builder(speedReflexcontext);
+
+                messVictory.setTitle("GAME OVER")
+
+                        .setIcon(R.drawable.ic_about);
+                if(score==5*carteNombre) {
+                    messVictory.setMessage("Woa vous etes très rapide ! Vous devriez essayer le niveau au dessus ! Voulez vous sauvegarder votre score ?");
+                }else if(score == 5*(carteNombre/2)) {
+                    messVictory.setMessage("Pas mal, mais vous pouvez faire mieux réesayer. Voulez vous sauvegarder votre score ? ");
+                }else{
+                    messVictory.setMessage("mmmh vous avez besoin d'entrainement, voulez vous sauvegarder votrez score ?");
+                }
+
+                        messVictory.setCancelable(false)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                deleteSave();
+                                in=false;
+                                try {
+                                    intentDataPlayer.putExtra("SCORE", score);
+                                    intentDataPlayer.putExtra("DIFFICULTER", difficulter);
+                                    parentActivity.startActivity(intentDataPlayer);
+                                } catch (Exception e) {
+                                    Log.i("Launch Activity fail", e.toString());
+                                }
+                                gameOver=false;
+                                parentActivity.finish();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                deleteSave();
+                                in=false;
+                                gameOver=false;
+                                parentActivity.finish();
+
+                            }
+                        });
+                Log.i("FinGame", " Alert cree");
+                AlertDialog alertMess = messVictory.create();
+                alertMess.show();
+            }
+        });
+
+
+        //}
     }
 
     public boolean choixJoueur(){
@@ -351,7 +550,9 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-
+        if(gameOver){
+            deleteSave();
+        }
     }
 
     @Override
@@ -365,7 +566,9 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         // Log.d("onTouchEvent", "r�cup�ration de la position du doigt");
         positionClickX = event.getX();// recuperation position X
         positionClickY = event.getY();// recuperation position Y
+        event2=event;
         int i;
+        Log.i("onTouch",": "+event.getAction());
         switch (event.getAction()) {// Swtich sur le type d'action
             case MotionEvent.ACTION_MOVE:
                 // System.out.println("ACTION_MOVE");
@@ -377,6 +580,7 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
                 if((positionClickX >= voitureB.getWidth() && positionClickX<(voitureB.getWidth()*6+5*(nbElements-1))) && (positionClickY >= (height-(voitureB.getHeight()*2)) && positionClickY<(height-voitureB.getHeight()) ) ){
                     Log.i("-> Fct <-", " clic X "+positionClickX);
                     Log.i("-> Fct <-", " clic Y "+positionClickY);
+                    //gameOver=true;
                     for(i=0;i<nbElements;i++){
                         if((positionClickX >= voitureB.getWidth()*(i+1) && positionClickX < voitureB.getWidth()*(i+2)+5*(nbElements-1)) &&(positionClickY >= (height-(voitureB.getHeight()*2)) && positionClickY<(height-voitureB.getHeight()) )){
                             Log.i("-> Fct <-", " i = "+i);
@@ -384,19 +588,27 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
                             choixDuJoueur=choixJoueur();
                             choixEffectuer=true;
                             Log.i("TestchoixJoueur",": "+choixDuJoueur);
+
+
                         }
                         else {
                             elementSelectione=-1;
                         }
                     }
                 }
+                //finGame2();
+                Log.i("down"," "+ event.getAction());
 
 
                 break;
             case MotionEvent.ACTION_UP:
-                //System.out.println("ACTION_UP");
+                System.out.println("ACTION_UP");
                 // RAZ des booleans
                 choixEffectuer=false;
+                if(gameOver) {
+                    finGame();
+                }
+                Log.i("UP"," "+ event.getAction());
 
                 break;
             default:
@@ -415,25 +627,46 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
     public void run() {
         Log.i("-> Fct <-", " run ");
         Canvas c = null;
+        //finGame();
         while (in) {
             tempsEcoule();
+            //finGame();
             try {
                 cv_thread.sleep(40);
+
                 try {
 
                     c = holder.lockCanvas(null);
                     dessin(c);
-                    if(choixEffectuer){
-                        augmenteScore();
-                        changerCarte();
-                        Log.i("Score :", " " + score);
-                        choixEffectuer=false;
-                        tempsJeu=0;
-                    }else{
-                        if(tempsJeu == tempsDispo){
+                    if(!gameOver) {
+                        if (choixEffectuer) {
+                            augmenteScore();
                             changerCarte();
-                            tempsJeu=0;
+                            //finGame();
+                            melangerElements();
+                            Log.i("Score :", " " + score);
+                            choixEffectuer = false;
+                            //if(!gameOver) {
+                                tempsJeu = tempsDispo;
+                            //}
+                        } else {
+                            if (tempsJeu == 0) {
+                                changerCarte();
+                                melangerElements();
+                                tempsJeu = tempsDispo;
+
+                            }
                         }
+                    }else {
+                       /* MotionEvent event = null;
+                        Log.i("Event"," "+event);
+                        event.setAction(1); //= MotionEvent.ACTION_UP;
+                        Log.i("Event 2", " " + event.getAction());
+                        this.onTouchEvent(event);*/
+                        Log.i("Run ", "GameOver");
+                        //cv_thread.currentThread().interrupt();
+                        //finGame();
+                        //in = false;
                     }
 
                 } finally {
@@ -442,12 +675,18 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
                     }
                 }
             } catch (Exception e) {
+                /*MotionEvent event = null;
+                event.setAction(1); //= MotionEvent.ACTION_UP;
+                this.onTouchEvent(event);
+                Log.i("Test ", "apres touchEvent");*/
                 Log.e("-> RUN <-", "PB DANS RUN");
                 cv_thread.currentThread().interrupt();
                 break;
             }
+           // finGame();
         }
         cv_thread.interrupt();
+        //finGame();
 
     }
 
@@ -460,13 +699,14 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
 
         if (!gameOver) {
             currentTime.setToNow();
+
             if (preCurrentTime.second != currentTime.second){
 
-                if(tempsJeu == tempsDispo){
-                    tempsJeu=0;
+                if(tempsJeu == 0){
+                    tempsJeu=tempsDispo;
                 }
                 else{
-                    tempsJeu++;
+                    tempsJeu-=1;
                 }
 
                 preCurrentTime.second = currentTime.second;
@@ -485,34 +725,114 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         }
     }
 
+    public Bitmap getCarte(int id){
+        Log.i("GetCarte"," "+id);
+        switch (id){
+            case 1: return carte1;
+            //break;
+            case 2: return carte2;
+           // break;
+            case 3: return carte3;
+            //break;
+            case 4: return carte4;
+            //break;
+            case 5: return carte5;
+            //break;
+            case 6: return carte6;
+            //break;
+            case 7: return carte7;
+            //break;
+            case 8: return carte8;
+            //break;
+            case 9: return carte9;
+            //break;
+            case 10: return carte10;
+            //break;
+            case 11: return carte11;
+            //break;
+            case 12: return carte12;
+            //break;
+            case 13: return carte13;
+            //break;
+            case 14: return carte14;
+            //break;
+            case 15: return carte15;
+            //break;
+            case 16: return carte16;
+            //break;
+            case 17: return carte17;
+            //break;
+            case 18: return carte18;
+            //break;
+            case 19: return carte19;
+            //break;
+            case 20: return carte20;
+            //break;
+            default: return null;
+        }
+        //return null;
+    }
+
+    public Elements getElement(String element){
+        if (element.equals("Voiture")) {
+            return voiture;
+
+        }
+        else if(element.equals("Ourse")){
+            return ourse;
+        }
+        else if(element.equals("Bonbon")){
+            return bonbon;
+        }
+        else if(element.equals("Lunette")){
+            return lunette;
+        }
+        else if(element.equals("Telephone")){
+            return telephone;
+        }
+        else{
+            return null;
+        }
+    }
+
+    public boolean getUSE(String use){
+        if(use.equals("true")){
+            return true;
+        }
+        else{
+            return  false;
+        }
+
+    }
+
     private void augmenteScore(){
         if(choixDuJoueur) {
             if (difficulter == 0) {
-                if (tempsJeu <= 5) {
+                if (tempsJeu >= 10) {
                     score += 5;
-                } else if (tempsJeu <= 10) {
+                } else if (tempsJeu <= 9 && tempsJeu >=6) {
                     score += 3;
-                } else if (tempsJeu <= 15) {
+                } else if (tempsJeu >= 5 && tempsJeu >= 3) {
                     score += 2;
                 } else {
                     score += 1;
                 }
             } else if (difficulter == 1) {
-                if (tempsJeu <= 4) {
+                if (tempsJeu >= 10) {
                     score += 5;
-                } else if (tempsJeu <= 7) {
+                } else if (tempsJeu <= 9 && tempsJeu >=6) {
                     score += 2;
-                } else if (tempsJeu <= 12) {
+                } else if (tempsJeu >= 5 && tempsJeu >= 3) {
                     score += 1;
                 }else{
                     score+=0;
                 }
             } else {
-                if (tempsJeu <= 3) {
+                if (tempsJeu >= 8) {
                     score += 5;
-                } else if (tempsJeu <= 6) {
+                } else if (tempsJeu <= 7 && tempsJeu >=5) {
                     score += 2;
-                } else if (tempsJeu <= 8) {
+                } else if (tempsJeu <= 4 && tempsJeu >= 3) {
                     score += 1;
                 } else {
                     score += 0;
@@ -530,95 +850,147 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         }
     }
 
+    private void melangerElements(){
+        int iNew;
+        Elements elementsTmp;
 
+        for (int i = 0; i < nbElements; i++) {
 
-    // ancienne fonction temps Ecouler
-    /*private void tempsEcoule() {
+            elementsTmp = tabEl[i];
+            rd = new Random();
+            iNew = rd.nextInt(nbElements);
+            tabEl[i] = tabEl[iNew];
+            tabEl[iNew] = elementsTmp;
 
-        if (!gameOver) {
-            currentTime.setToNow();
-            Log.i("curentTime", ": " + currentTime.second);
-            preTempsJeu =tempsJeu;
-
-            if(preTempsJeu ==20 && preCurrentTime.second ==59){
-                preCurrentTime.second =0;
-            }
-
-            Log.i("preCurrentTime",": "+preCurrentTime.second);
-
-           if (currentTime.second > iniTime.second || (preCurrentTime.second == 59) ) {
-
-                if(preCurrentTime.second == 59 && currentTime.second <=iniTime.second){
-                    if(currentTime.second == 0){
-                        tempsJeu = (59 +currentTime.second+1) - iniTime.second;
-                    }else {
-                        tempsJeu = (59 +currentTime.second) - iniTime.second;
-                   }
-                }
-                else {
-                    tempsJeu = (currentTime.second - iniTime.second);
-                }
-                tempsJeu += oldTempsJeu;
-                //Log.i("Fct","tempsJeu : "+tempsJeu);
-                if(tempsJeu >= 63){
-                    tempsJeu -= 63;
-                   // Log.i("Fct","tempsJeu : -63 ");
-                }
-                else if(tempsJeu >= 42) {
-                    tempsJeu -= 42;
-                   // Log.i("Fct","tempsJeu : -42 ");
-                }
-                else if (tempsJeu >= 21) {
-                    tempsJeu -= 21;
-                   // Log.i("Fct","tempsJeu : -21 ");
-
-                }
-
-                if (tempsJeu < 10) {
-
-                    temps = "0" + tempsJeu;
-                } else {
-
-                    temps = "" + tempsJeu;
-                }
-
-                preTempsJeu =tempsJeu;
-
-                if(currentTime.second==59){
-                    preCurrentTime.second=59;
-                }
-
-
-            } else {
-                //Log.i("Fct chrono","current < init");
-
-                tempsJeu = ((currentTime.second + 63) - iniTime.second);//( iniTime.second - currentTime.second);//((currentTime.second + 21) - iniTime.second);
-                //Log.i("Fct","tempsJeu : "+tempsJeu);
-                tempsJeu += oldTempsJeu;
-                if(tempsJeu >= 63){
-                    tempsJeu -= 63;
-                   // Log.i("Fct","tempsJeu : -63 ");
-                }
-                else if(tempsJeu >= 42) {
-                    tempsJeu -= 42;
-                   // Log.i("Fct","tempsJeu : -42 ");
-                }
-                else if (tempsJeu >= 21) {
-                    tempsJeu -= 21;
-                    //Log.i("Fct","tempsJeu : -21 ");
-                }
-
-                if (tempsJeu < 10) {
-
-
-                    temps = "0" + tempsJeu;
-                } else {
-
-                    temps = "" + tempsJeu;
-
-                }
-            }
         }
-    }*/
+    }
+
+    public void saveGame() {
+        SharedPreferences prefs = getContext().getSharedPreferences(
+                "MyContext", SpeedReflexActivity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        StringBuilder sauvegardeTasCarte = new StringBuilder();
+        for (int i = 0; i < carteNombre; i++) {
+
+                sauvegardeTasCarte.append(tabJeu[i].bonElements.getForme()).append(",");
+                sauvegardeTasCarte.append(tabJeu[i].getIdCarte()).append(",");
+                sauvegardeTasCarte.append(tabJeu[i].getUse()).append(",");
+
+        }
+        editor.putString("TasCarte", sauvegardeTasCarte.toString());
+        Log.i("TasCarte : ",sauvegardeTasCarte.toString());
+
+        StringBuilder sauvegardeElement = new StringBuilder();
+        for (int i = 0; i < nbElements; i++) {
+
+                sauvegardeElement.append(tabEl[i].getForme()).append(",");
+
+        }
+        editor.putString("Element", sauvegardeElement.toString());
+        Log.i("Element : ", sauvegardeElement.toString());
+
+        editor.putInt("IdCarte", carteSelectioner.getIdCarte());
+        editor.putString("Forme", carteSelectioner.getBonElements().getForme());
+        editor.putInt("CarteAfficher",carteAfficher);
+        editor.putInt("Score", score);
+        editor.putInt("TempsJeu", tempsJeu);
+        editor.putInt("Difficulter",difficulter);
+        editor.putInt("Seconde",preCurrentTime.second);
+
+        editor.commit();
+
+    }
+
+    public void loadGame() {
+        SharedPreferences prefs = getContext().getSharedPreferences(
+                "MyContext", SpeedReflexActivity.MODE_PRIVATE);
+
+        String retourTasCarte = prefs.getString("TasCarte", null);
+        String retourElement = prefs.getString("Element", null);
+
+        Log.i(">>> restaurer", " TasCarte");
+        StringTokenizer stRef = new StringTokenizer(retourTasCarte, ",");
+        for (int i = 0; i < carteNombre; i++) {
+                loadTabCarte(i, stRef.nextToken().toString(), Integer.parseInt(stRef.nextToken()), stRef.nextToken().toString());
+               // tabJeu[i] = Carte.parseCarte(stRef.nextToken());
+
+
+        }
+
+        Log.i(">>> restaurer", " tabElements ");
+        StringTokenizer stJeu = new StringTokenizer(retourElement, ",");
+        for (int i = 0; i < nbElements; i++) {
+                loadTabElement(i,stJeu.nextToken().toString());
+               // tabEl[i] = Elements.parseElements(stJeu.nextToken());
+
+        }
+        Log.i("avt"," loadCarteSelectionner");
+        loadCarteSelectionner(prefs.getInt("IdCarte", 0), prefs.getString("Forme", null));
+        carteAfficher=prefs.getInt("CarteAfficher",0);
+        score = prefs.getInt("Score", 0);
+        oldTempsJeu = prefs.getInt("TempsJeu", 0);
+        difficulter= prefs.getInt("Difficulter",0);
+        preCurrentTime.second=prefs.getInt("Seconde",0);
+
+    }
+
+    public void loadTabCarte(int i,String element,int idCarte, String use ){
+        tabJeu[i] = new Carte(getElement(element),getCarte(idCarte),idCarte);
+        //tabJeu[i].setIdCarte(idCarte);
+        //tabJeu[i].setImageCarte(getCarte(idCarte));
+        //tabJeu[i].setBonElements(getElement(element));
+        tabJeu[i].setUse(getUSE(use));
+        Log.i("--> FCT <--","LoadTabCarte");
+
+        //Log.i("3 parametre de loadTabCarte"," "+idCarte);
+
+    }
+
+    public void loadTabElement(int i,String element){
+        tabEl[i]=new Elements();
+        tabEl[i].setElement(getElement(element));
+        Log.i("--> FCT <--", "LoadTabElement");
+
+    }
+
+    public void loadCarteSelectionner(int idCarte,String element){
+        //Elements tmp= new Elements();
+        //tmp.setElement(getElement(element));
+        Log.i("idCarte"+idCarte," element"+element);
+        carteSelectioner=new Carte(getElement(element),getCarte(idCarte),idCarte);
+        Log.i("--> FCT <--", "LoadCarteSelectionner");
+
+    }
+
+    public boolean loadExist() {
+        SharedPreferences prefs = getContext().getSharedPreferences(
+                "MyContext", SpeedReflexActivity.MODE_PRIVATE);
+
+        if (prefs.getString("TasCarte", null) != null
+                && prefs.getString("Element", null) != null
+                && prefs.getInt("TempsJeu", 0) != 0 && prefs.getString("Forme",null)!=null) {
+            return true;
+        } else {
+
+            return false;
+        }
+    }
+
+    public void deleteSave() {
+        SharedPreferences prefs = getContext().getSharedPreferences(
+                "MyContext", SpeedReflexActivity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        editor.remove("TasCarte");
+        editor.remove("Element");
+        editor.remove("Score");
+        editor.remove("TempsJeu");
+        editor.remove("Difficulter");
+        editor.remove("IdCarte");
+        editor.remove("Forme");
+
+        editor.commit();
+
+    }
 
 }
