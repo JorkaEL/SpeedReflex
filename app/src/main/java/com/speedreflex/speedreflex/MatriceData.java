@@ -44,7 +44,7 @@ public class MatriceData {
 
 
     public String toString(){
-        String strData = pseudo + ","+score+","+","+difficulter;
+        String strData = difficulter+","+pseudo + ","+score;
         return strData;
 
     }

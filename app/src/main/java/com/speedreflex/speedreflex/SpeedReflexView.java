@@ -39,6 +39,7 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
     Intent intentDataPlayer = null;
     public boolean gameOver; // destiné a savoir si le jeu est fini
     MotionEvent event2 = null;
+    boolean continu=false;
 
     //concerne le chrono
     private Time currentTime = new Time();
@@ -49,11 +50,13 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
     private String temps;
 
     //dificulter
-    public Activity menuActivity;
+
     public int difficulter;
+    public String difficulterString;
 
 
     public int score;
+    //public String scoreString;
     public boolean choixEffectuer=false;
 
     private Bitmap voitureB;
@@ -185,10 +188,13 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
 
         if(difficulter==0) {
             tempsDispo = 20;
+            difficulterString="Facile";
         }else if(difficulter==1){
             tempsDispo = 15;
+            difficulterString="Normal";
         }else{
             tempsDispo=10;
+            difficulterString="Difficile";
         }
 
 
@@ -385,87 +391,19 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
 
         if(fingame || ancienneCarte==carteAfficher ){
             gameOver=true;
-            finGame();
-            //in=false;
+
         }
 
     }
 
-    public void finGame2(){
-        //Log.i("FinGame","gameOver = "+gameOver);
-        if(gameOver){
-            Log.i("FinGame", "gameOver = " + gameOver);
-            //in=false;
-            AlertDialog.Builder messVictory = new AlertDialog.Builder(
-                    speedReflexcontext);
 
-            messVictory.setTitle(R.string.TitreBtnAPropos);
-
-            messVictory.setIcon(R.drawable.ic_about);
-
-            TextView txtViewQts = new TextView(speedReflexcontext);
-            Log.i("FinGame"," cree textView ");
-
-            txtViewQts.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT));
-            txtViewQts.setPadding(20, 10, 20, 10);
-            txtViewQts.setTextSize(20);
-            txtViewQts
-                    .setText(Html
-                            .fromHtml("<center><small>Victoire</small></center>"
-                                    + "<br>"
-                                    + "<br>"
-                                    + "<center><b>Vous avez gagne ! Felicitation</b></center><br>"
-                                    + "<br>"
-                                    + "<small>Voulez vous sauvegarder votre temps</small><br>"));
-            messVictory.setView(txtViewQts);
-
-            messVictory.setPositiveButton("Oui",
-                    new android.content.DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            in = false;
-                            /*try {
-                                intentDataPlayer.putExtra("TEMPS", temps);
-                                intentDataPlayer.putExtra("MATRICE", matriceJeu);
-                                parentActivity.startActivity(intentDataPlayer);
-                            } catch (Exception e) {
-                                Log.i("Launch Activity fail", e.toString());
-                            }*/
-
-                            parentActivity.finish();
-
-                        }
-                    });
-            messVictory.setNegativeButton("Non",
-                    new android.content.DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                            in = false;
-                            parentActivity.finish();
-
-                        }
-                    });
-            messVictory.setOnCancelListener(new android.content.DialogInterface.OnCancelListener() {
-
-                @Override
-                public void onCancel(DialogInterface dialog) {
-
-                }
-            });
-            messVictory.show();
-
-        }
-    }
 
     public void finGame(){
         //Log.i("FinGame","gameOver = "+gameOver);
         //if(gameOver){
             Log.i("FinGame", "gameOver = " + gameOver);
-            //in=false;
+            in=false;
+            //deleteSave();
 
 
 
@@ -489,24 +427,27 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
                         messVictory.setCancelable(false)
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
+                                Log.i("FinGame"," deleteSave");
                                 deleteSave();
                                 in=false;
                                 try {
-                                    intentDataPlayer.putExtra("SCORE", score);
-                                    intentDataPlayer.putExtra("DIFFICULTER", difficulter);
+                                    intentDataPlayer.putExtra("SCORE", ""+score);
+                                    intentDataPlayer.putExtra("DIFFICULTER", difficulterString);
+                                    Log.i("intentData",": "+intentDataPlayer);
                                     parentActivity.startActivity(intentDataPlayer);
                                 } catch (Exception e) {
                                     Log.i("Launch Activity fail", e.toString());
                                 }
-                                gameOver=false;
+                                //gameOver=false;
                                 parentActivity.finish();
                             }
                         })
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
+                                Log.i("FinGame"," deleteSave");
                                 deleteSave();
                                 in=false;
-                                gameOver=false;
+                                //gameOver=false;
                                 parentActivity.finish();
 
                             }
@@ -605,9 +546,9 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
                 System.out.println("ACTION_UP");
                 // RAZ des booleans
                 choixEffectuer=false;
-                if(gameOver) {
+               /* if(gameOver) {
                     finGame();
-                }
+                }*/
                 Log.i("UP"," "+ event.getAction());
 
                 break;
@@ -627,10 +568,10 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
     public void run() {
         Log.i("-> Fct <-", " run ");
         Canvas c = null;
-        //finGame();
+
         while (in) {
             tempsEcoule();
-            //finGame();
+
             try {
                 cv_thread.sleep(40);
 
@@ -642,31 +583,31 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
                         if (choixEffectuer) {
                             augmenteScore();
                             changerCarte();
-                            //finGame();
-                            melangerElements();
+                            if(difficulter != 0) {
+                                melangerElements();
+                            }
                             Log.i("Score :", " " + score);
                             choixEffectuer = false;
-                            //if(!gameOver) {
+
                                 tempsJeu = tempsDispo;
-                            //}
+
                         } else {
                             if (tempsJeu == 0) {
                                 changerCarte();
-                                melangerElements();
+
                                 tempsJeu = tempsDispo;
+                                if(difficulter!=0) {
+                                    melangerElements();
+                                }
 
                             }
                         }
                     }else {
-                       /* MotionEvent event = null;
-                        Log.i("Event"," "+event);
-                        event.setAction(1); //= MotionEvent.ACTION_UP;
-                        Log.i("Event 2", " " + event.getAction());
-                        this.onTouchEvent(event);*/
+
                         Log.i("Run ", "GameOver");
-                        //cv_thread.currentThread().interrupt();
-                        //finGame();
-                        //in = false;
+                        //deleteSave();
+                        finGame();
+
                     }
 
                 } finally {
@@ -675,18 +616,15 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
                     }
                 }
             } catch (Exception e) {
-                /*MotionEvent event = null;
-                event.setAction(1); //= MotionEvent.ACTION_UP;
-                this.onTouchEvent(event);
-                Log.i("Test ", "apres touchEvent");*/
+
                 Log.e("-> RUN <-", "PB DANS RUN");
                 cv_thread.currentThread().interrupt();
                 break;
             }
-           // finGame();
+
         }
         cv_thread.interrupt();
-        //finGame();
+
 
     }
 
@@ -921,10 +859,10 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         StringTokenizer stJeu = new StringTokenizer(retourElement, ",");
         for (int i = 0; i < nbElements; i++) {
                 loadTabElement(i,stJeu.nextToken().toString());
-               // tabEl[i] = Elements.parseElements(stJeu.nextToken());
+
 
         }
-        Log.i("avt"," loadCarteSelectionner");
+        Log.i("avt", " loadCarteSelectionner");
         loadCarteSelectionner(prefs.getInt("IdCarte", 0), prefs.getString("Forme", null));
         carteAfficher=prefs.getInt("CarteAfficher",0);
         score = prefs.getInt("Score", 0);
@@ -936,9 +874,7 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
 
     public void loadTabCarte(int i,String element,int idCarte, String use ){
         tabJeu[i] = new Carte(getElement(element),getCarte(idCarte),idCarte);
-        //tabJeu[i].setIdCarte(idCarte);
-        //tabJeu[i].setImageCarte(getCarte(idCarte));
-        //tabJeu[i].setBonElements(getElement(element));
+
         tabJeu[i].setUse(getUSE(use));
         Log.i("--> FCT <--","LoadTabCarte");
 
@@ -954,8 +890,7 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
     }
 
     public void loadCarteSelectionner(int idCarte,String element){
-        //Elements tmp= new Elements();
-        //tmp.setElement(getElement(element));
+
         Log.i("idCarte"+idCarte," element"+element);
         carteSelectioner=new Carte(getElement(element),getCarte(idCarte),idCarte);
         Log.i("--> FCT <--", "LoadCarteSelectionner");
@@ -966,9 +901,11 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         SharedPreferences prefs = getContext().getSharedPreferences(
                 "MyContext", SpeedReflexActivity.MODE_PRIVATE);
 
-        if (prefs.getString("TasCarte", null) != null
+        if ((prefs.getString("TasCarte", null) != null
                 && prefs.getString("Element", null) != null
-                && prefs.getInt("TempsJeu", 0) != 0 && prefs.getString("Forme",null)!=null) {
+                && prefs.getInt("TempsJeu", 0) != 0
+                && prefs.getString("Forme",null)!=null)
+                || continu==true) {
             return true;
         } else {
 
@@ -991,6 +928,14 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
 
         editor.commit();
 
+    }
+
+    public void setIntentDataPlayer(Intent intentClassDataPlayer) {
+        this.intentDataPlayer = intentClassDataPlayer;
+    }
+
+    public void setContinue(boolean continu){
+        this.continu=continu;
     }
 
 }

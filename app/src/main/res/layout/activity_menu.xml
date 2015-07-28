@@ -33,10 +33,21 @@
             android:gravity="center" >
 
             <Button
-                android:id="@+id/buttonDifficulte"
+                android:id="@+id/buttonStart2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/bouttonDificulteF" />
+                android:text="@string/boutonJeuStart2" />
+        </TableRow>
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center" >
+
+            <Button
+                android:id="@+id/buttonDifficulte"
+                android:layout_width="400px"
+                android:layout_height="wrap_content"
+                android:text="@string/bouttonDifficulteF" />
         </TableRow>
 
         <TableRow

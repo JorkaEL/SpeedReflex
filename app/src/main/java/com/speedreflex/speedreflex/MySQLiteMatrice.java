@@ -12,10 +12,10 @@ public class MySQLiteMatrice extends SQLiteOpenHelper {
 
     // SQL BDD
     static final String DATABASE_NAME = "bddSpeedReflex.db";
-    static final int DATABASE_VERSION = 1;
+    static final int DATABASE_VERSION = 2;
 
     // SQL requete
-    static final String TABLE = "SCORE";
+    static final String TABLE = "DIFFICULTER";
     static final String COLUMN_ID = "_ID";
     static final String COLUMN_SPEUDO = "_SPEUDO";
 

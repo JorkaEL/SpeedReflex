@@ -3,6 +3,7 @@ package com.speedreflex.speedreflex;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -17,6 +18,8 @@ public class SpeedReflexActivity extends Activity {
 
     SpeedReflexView srView;
     public int difficulter;
+    MatricesDataSource database =null;
+    Intent intentDataPlayer=null;
 
 
     @Override
@@ -29,10 +32,23 @@ public class SpeedReflexActivity extends Activity {
         Bundle niveau= this.getIntent().getExtras();
         difficulter=niveau.getInt("difficulter");
 
+
+        intentDataPlayer = new Intent(this,ActivityDatasPlayer.class);
+
+        Log.i("intentData",": "+intentDataPlayer);
+
+        database =new MatricesDataSource(this);
+
         srView=(SpeedReflexView)findViewById(R.id.SpeedReflexView);
         srView.parentActivity=this;
         Log.i("avt set difficulter:"," "+difficulter);
         srView.setDificulter(difficulter);
+        if(niveau.getBoolean("NEW")){
+            srView.deleteSave();
+        }else{
+            srView.setContinue(true);
+        }
+        srView.setIntentDataPlayer(intentDataPlayer);
         //Log.i("apres set difficulter:", " " + difficulter);
 
         srView.setVisibility(View.VISIBLE);
@@ -59,6 +75,7 @@ public class SpeedReflexActivity extends Activity {
     protected void onPause() {
         super.onPause();
         //srView.deleteSave();
+        Log.i("OnPause "," SaveGame");
         srView.saveGame();
         srView.setThread(false);
     }

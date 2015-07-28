@@ -3,14 +3,15 @@
 
     <string name="app_name">SpeedReflex</string>
 
-    <string name="boutonJeuStart">JOUER</string>
+    <string name="boutonJeuStart">Nouveau</string>
+    <string name="boutonJeuStart2">Continuer</string>
     <string name="bouttonQuitter">QUITTER</string>
     <string name="bouttonSonOn">Son : ON</string>
     <string name="bouttonScores">Scores</string>
     <string name="bouttonSonOff">Son : OFF</string>
-    <string name="bouttonDificulteF">Dificulter : FACILE</string>
-    <string name="bouttonDificulteN">Dificulter : NORMAL</string>
-    <string name="bouttonDificulteD">Dificulter : DIFFICILE</string>
+    <string name="bouttonDifficulteF">Difficulter : FACILE</string>
+    <string name="bouttonDifficulteN">Difficulter : NORMAL</string>
+    <string name="bouttonDifficulteD">Difficulter : DIFFICILE</string>
     <string name="btnMenuHelp">HELP</string>
     <string name="btnMenuAPropos">A propos</string>
     <string name="TitreBtnAPropos">A propos :</string>
