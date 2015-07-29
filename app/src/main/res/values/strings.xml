@@ -12,6 +12,8 @@
     <string name="bouttonDifficulteF">Difficulter : FACILE</string>
     <string name="bouttonDifficulteN">Difficulter : NORMAL</string>
     <string name="bouttonDifficulteD">Difficulter : DIFFICILE</string>
+    <string name="bouttonVibreOn">Vibration : ON</string>
+    <string name="bouttonVibreOff">Vibration : OFF</string>
     <string name="btnMenuHelp">HELP</string>
     <string name="btnMenuAPropos">A propos</string>
     <string name="TitreBtnAPropos">A propos :</string>

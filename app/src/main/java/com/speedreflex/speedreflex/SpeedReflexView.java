@@ -14,6 +14,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Vibrator;
 import android.text.Html;
 import android.text.format.Time;
 import android.util.AttributeSet;
@@ -40,6 +41,8 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
     public boolean gameOver; // destiné a savoir si le jeu est fini
     MotionEvent event2 = null;
     boolean continu=false;
+    boolean vibre=false;
+    boolean sound=false;
 
     //concerne le chrono
     private Time currentTime = new Time();
@@ -129,6 +132,16 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
     public float positionClickX;
     public float positionClickY;
 
+    //affiche le resultat du joueur
+    private Bitmap yes;
+    private Bitmap no;
+    private boolean afficheLeChoix=false;
+    private boolean attendre=false;
+    private boolean attendrefirst=false;
+    private Time secondeAtt = new Time();
+    private int secondepasse;
+    public Vibrator vibration;
+
 
 
     public SpeedReflexView(Context context,AttributeSet attrs) {
@@ -145,6 +158,8 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         speedReflexRes = speedReflexcontext.getResources();
         Log.i(">>> loadimages", "SpeedReflexView 2 ");
 
+        vibration = (Vibrator) this.speedReflexcontext.getSystemService(Context.VIBRATOR_SERVICE);
+
         loadimages(speedReflexRes);
         Log.i(">>> Projet", "SpeedReflexView 3 ");
 
@@ -157,6 +172,10 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
     }
 
     private void loadimages(Resources speedReflexRes) {
+
+        yes=BitmapFactory.decodeResource(speedReflexRes,R.drawable.yes);
+        no=BitmapFactory.decodeResource(speedReflexRes,R.drawable.no);
+
         //image des elements
         voitureB = BitmapFactory.decodeResource(speedReflexRes, R.drawable.voiture);
         ourseB = BitmapFactory.decodeResource(speedReflexRes, R.drawable.ourson);
@@ -167,6 +186,8 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         //image des Cartes
         carte1 = BitmapFactory.decodeResource(speedReflexRes, R.drawable.testcarte);
         carte2 = BitmapFactory.decodeResource(speedReflexRes,R.drawable.testcarte2);
+        carte3 = BitmapFactory.decodeResource(speedReflexRes,R.drawable.testcarte3bis);
+        carte4 = BitmapFactory.decodeResource(speedReflexRes,R.drawable.testcarte4);
 
     }
 
@@ -175,7 +196,7 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
 
         height = getHeight();
         width = getWidth();
-        carteNombre=2;
+        carteNombre=4;
 
         tabJeu = new Carte[carteNombre];
 
@@ -197,6 +218,7 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
             difficulterString="Difficile";
         }
 
+        secondepasse=0;
 
         if(loadExist()){
             tabEl=new Elements[nbElements];
@@ -254,6 +276,8 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         //partie carte
         tabJeu[0] = new Carte(lunette,carte1,1);
         tabJeu[1] = new Carte(voiture, carte2,2);
+        tabJeu[2] = new Carte(ourse,carte3,3);
+        tabJeu[3] = new Carte(telephone,carte4,4);
 
     }
 
@@ -262,6 +286,7 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         canvas.drawRGB(105, 105, 105);
         paintElement(canvas);
         paintCarte(canvas);
+        paintChoix(canvas);
         paintTemps(canvas);
     }
 
@@ -325,6 +350,16 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         paint.setTextSize(widthCarte/2);
         canvas.drawText(temps, widthElement * 2 + widthElement / 2, width / 3, paint);
 
+    }
+
+    private void paintChoix(Canvas canvas){
+        if(attendrefirst) {
+            if (afficheLeChoix) {
+                canvas.drawBitmap(yes, widthElement * 4, heightCarte+heightElement*2, null);
+            } else {
+                canvas.drawBitmap(no, widthElement * 4, heightCarte+heightElement*2, null);
+            }
+        }
     }
 
 
@@ -402,6 +437,7 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         //Log.i("FinGame","gameOver = "+gameOver);
         //if(gameOver){
             Log.i("FinGame", "gameOver = " + gameOver);
+        if (!attendre){
             in=false;
             //deleteSave();
 
@@ -417,11 +453,19 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
 
                         .setIcon(R.drawable.ic_about);
                 if(score==5*carteNombre) {
-                    messVictory.setMessage("Woa vous etes très rapide ! Vous devriez essayer le niveau au dessus ! Voulez vous sauvegarder votre score ?");
-                }else if(score == 5*(carteNombre/2)) {
-                    messVictory.setMessage("Pas mal, mais vous pouvez faire mieux réesayer. Voulez vous sauvegarder votre score ? ");
-                }else{
-                    messVictory.setMessage("mmmh vous avez besoin d'entrainement, voulez vous sauvegarder votrez score ?");
+                    messVictory.setMessage(" Score : "+score+" points, Woa vous etes très rapide ! Vous devriez essayer avec un niveau de difficulté supérieur ! Voulez vous sauvegarder votre score ?");
+                }
+                else if(score>=5*(carteNombre-(carteNombre/3))){
+                    messVictory.setMessage(" Score : "+score+" points, Super ! Aller plus qu'un petit effort, pour être le meilleurd réesayer! Voulez vous sauvegarder votre score ? ");
+                }
+                else if(score >= 5*(carteNombre/2)) {
+                    messVictory.setMessage(" Score : "+score+" points, Bien, mais vous pouvez faire mieux réesayer. Voulez vous sauvegarder votre score ? ");
+                }
+                else if(score>= 5*(carteNombre/3)){
+                    messVictory.setMessage(" Score : "+score+" points, Pas mal, vous commencez a comprendre le jeu, voulez vous sauvegarder votrez score ?");
+                }
+                else{
+                    messVictory.setMessage(" Score : "+score+" points, mmmh vous avez besoin d'entrainement, voulez vous sauvegarder votrez score ?");
                 }
 
                         messVictory.setCancelable(false)
@@ -459,7 +503,7 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         });
 
 
-        //}
+        }
     }
 
     public boolean choixJoueur(){
@@ -509,7 +553,7 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         positionClickY = event.getY();// recuperation position Y
         event2=event;
         int i;
-        Log.i("onTouch",": "+event.getAction());
+        //Log.i("onTouch",": "+event.getAction());
         switch (event.getAction()) {// Swtich sur le type d'action
             case MotionEvent.ACTION_MOVE:
                 // System.out.println("ACTION_MOVE");
@@ -543,13 +587,13 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
 
                 break;
             case MotionEvent.ACTION_UP:
-                System.out.println("ACTION_UP");
+                //System.out.println("ACTION_UP");
                 // RAZ des booleans
-                choixEffectuer=false;
+                //choixEffectuer=false;
                /* if(gameOver) {
                     finGame();
                 }*/
-                Log.i("UP"," "+ event.getAction());
+               // Log.i("UP"," "+ event.getAction());
 
                 break;
             default:
@@ -580,32 +624,49 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
                     c = holder.lockCanvas(null);
                     dessin(c);
                     if(!gameOver) {
+                       // if(attendre){ afficheChoix(); }else{
                         if (choixEffectuer) {
                             augmenteScore();
-                            changerCarte();
-                            if(difficulter != 0) {
+
+                            //changerCarte();
+                            /*if (difficulter != 0) {
                                 melangerElements();
-                            }
+                            }*/
                             Log.i("Score :", " " + score);
                             choixEffectuer = false;
+                            attendre = true;
+                            secondeAtt.setToNow();
 
-                                tempsJeu = tempsDispo;
+                            //tempsJeu = tempsDispo;
 
-                        } else {
+                        }
+                        else if(attendre){
+                            attendrefirst=true;
+                            afficheChoix();
+                            if(!afficheLeChoix){
+                                //vibration.vibrate(500);
+                            }
+                        }
+                        else {
                             if (tempsJeu == 0) {
-                                changerCarte();
+                                //changerCarte();
+                                attendre =true;
+                                secondeAtt.setToNow();
+                                choixDuJoueur=false;
 
-                                tempsJeu = tempsDispo;
-                                if(difficulter!=0) {
+                                //tempsJeu = tempsDispo;
+                                /*if (difficulter != 0) {
                                     melangerElements();
-                                }
+                                }*/
 
                             }
                         }
+                    //}
                     }else {
 
                         Log.i("Run ", "GameOver");
                         //deleteSave();
+                        afficheChoix();
                         finGame();
 
                     }
@@ -636,29 +697,30 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
     private void tempsEcoule() {
 
         if (!gameOver) {
-            currentTime.setToNow();
 
-            if (preCurrentTime.second != currentTime.second){
+            if(!attendre) {
+                currentTime.setToNow();
 
-                if(tempsJeu == 0){
-                    tempsJeu=tempsDispo;
+                if (preCurrentTime.second != currentTime.second) {
+
+                    if (tempsJeu == 0) {
+                        tempsJeu = tempsDispo;
+                    } else {
+                        tempsJeu -= 1;
+                    }
+
+                    preCurrentTime.second = currentTime.second;
                 }
-                else{
-                    tempsJeu-=1;
+
+                if (tempsJeu < 10) {
+
+                    temps = "0" + tempsJeu;
+                } else {
+
+                    temps = "" + tempsJeu;
                 }
 
-                preCurrentTime.second = currentTime.second;
             }
-
-            if (tempsJeu < 10) {
-
-                temps = "0" + tempsJeu;
-            } else {
-
-                temps = "" + tempsJeu;
-            }
-
-
 
         }
     }
@@ -776,6 +838,9 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
                     score += 0;
                 }
             }
+
+
+
         }
     }
 
@@ -786,6 +851,51 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         }else{
             choixCarte();
         }
+    }
+
+    private void afficheChoix(){
+        currentTime.setToNow();
+        //Log.i("CurrentTime", " : " + currentTime.second);
+        //Log.i("SecondeATT"," : "+secondeAtt.second);
+        if(secondepasse<2){
+            if(secondeAtt.second!=currentTime.second) {
+
+            secondepasse++;
+                secondeAtt.second=currentTime.second;
+             }
+
+            if(choixDuJoueur){
+                afficheLeChoix=true;
+                //imgResultat= yes;
+            }
+            else{
+                afficheLeChoix=false;
+
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        vibration.vibrate(500);
+                    }
+
+                });
+            }
+
+
+        }else{
+            attendre=false;
+            attendrefirst=false;
+            changerCarte();
+            if (difficulter != 0) {
+                melangerElements();
+            }
+            tempsJeu = tempsDispo;
+            secondepasse=0;
+            choixEffectuer=false;
+            preCurrentTime.second=currentTime.second;
+
+        }
+
     }
 
     private void melangerElements(){
@@ -849,7 +959,7 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         Log.i(">>> restaurer", " TasCarte");
         StringTokenizer stRef = new StringTokenizer(retourTasCarte, ",");
         for (int i = 0; i < carteNombre; i++) {
-                loadTabCarte(i, stRef.nextToken().toString(), Integer.parseInt(stRef.nextToken()), stRef.nextToken().toString());
+            loadTabCarte(i, stRef.nextToken().toString(), Integer.parseInt(stRef.nextToken()), stRef.nextToken().toString());
                // tabJeu[i] = Carte.parseCarte(stRef.nextToken());
 
 
@@ -936,6 +1046,18 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
 
     public void setContinue(boolean continu){
         this.continu=continu;
+    }
+
+    public void setVibration(boolean vibre){
+        this.vibre=vibre;
+    }
+
+    public void setSound(boolean sound){
+        this.sound=sound;
+    }
+
+    public boolean getSound(){
+        return this.sound;
     }
 
 }

@@ -29,6 +29,8 @@ public class MenuActivity extends Activity {
     final Context context = this;
     private MatricesDataSource database=null;
     public  MediaPlayer monMedPlayer;
+    public boolean testStateSound = false;
+    public boolean testStateVibration = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,21 +39,32 @@ public class MenuActivity extends Activity {
         setContentView(R.layout.activity_menu);
         intentVar = new Intent(this, SpeedReflexActivity.class);
         intentVar.putExtra("difficulter",testdifficulter);
+        intentVar.putExtra("vibration",testStateVibration);
+        intentVar.putExtra("SOUND",testStateSound);
 
         Button btnStart = (Button) findViewById(R.id.buttonStart);
+        Button btnStart2 = (Button) findViewById(R.id.buttonStart2);
         Button btnQuitter = (Button) findViewById(R.id.buttonQuit);
-        Button btnDificulter = (Button) findViewById(R.id.buttonDifficulte);
+        Button btnDifficulter = (Button) findViewById(R.id.buttonDifficulte);
         Button btnScore = (Button) findViewById(R.id.buttonScores);
+        Button btnSound = (Button) findViewById(R.id.buttonSound);
+        Button btnVibration=(Button) findViewById(R.id.buttonVibration);
 
         btnQuitter.setOnClickListener(new ButtonQuitClickListener());
         btnStart.setOnClickListener(new ButtonStartClickListener(btnStart));
-        btnDificulter.setOnClickListener(new ButtonDifficulteClickListener(btnDificulter));
+        btnStart2.setOnClickListener(new ButtonStart2ClickListener(btnStart2));
+        btnDifficulter.setOnClickListener(new ButtonDifficulteClickListener(btnDifficulter));
         btnScore.setOnClickListener(new ButtonScoreClickListener(btnScore));
+        btnSound.setOnClickListener(new ButtonSoundClickListener(btnSound));
+        btnVibration.setOnClickListener(new ButtonVibrationClickListener(btnVibration));
 
         Log.i("onCreate", "CreationBase de donnees");
         database = new MatricesDataSource(context);
+        //database.dropTableMatrice();
+        Log.i("database : ",""+database);
+        monMedPlayer = MediaPlayer.create(this.getBaseContext(),R.raw.ambiance);
+        monMedPlayer.setLooping(true);
 
-        //monMedPlayer = MediaPlayer.create(this.getBaseContext(),R.raw.am)
 
     }
 
@@ -89,6 +102,23 @@ public class MenuActivity extends Activity {
 
         @Override
         public void onClick(View v) {
+            Log.i("New"," Game");
+            intentVar.putExtra("NEW",true);
+            startActivity(intentVar);
+        }
+    };
+
+    class ButtonStart2ClickListener implements View.OnClickListener {
+        Button btn;
+
+        ButtonStart2ClickListener(Button button) {
+            this.btn = button;
+        }
+
+        @Override
+        public void onClick(View v) {
+            Log.i("Continue"," Game");
+            intentVar.putExtra("NEW", false);
             startActivity(intentVar);
         }
     };
@@ -113,12 +143,18 @@ public class MenuActivity extends Activity {
     class ButtonQuitClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
+
+            //monMedPlayer.setLooping(false);
+            if (testStateSound) {
+                monMedPlayer.pause();
+            }
             finish();
         }
     };
 
     class ButtonDifficulteClickListener implements View.OnClickListener {
         Button btn;
+
 
         ButtonDifficulteClickListener(Button button) {
             this.btn = button;
@@ -135,15 +171,15 @@ public class MenuActivity extends Activity {
             Log.i("bouton difficulter"," : "+testdifficulter);
 
             if (testdifficulter == 0) {
-                btn.setText(R.string.bouttonDificulteF);
+                btn.setText(R.string.bouttonDifficulteF);
                 intentVar.putExtra("difficulter", testdifficulter);
 
             } else if(testdifficulter == 1) {
-                btn.setText(R.string.bouttonDificulteN);
+                btn.setText(R.string.bouttonDifficulteN);
                 intentVar.putExtra("difficulter", testdifficulter);
 
             } else if(testdifficulter == 2) {
-                btn.setText(R.string.bouttonDificulteD);
+                btn.setText(R.string.bouttonDifficulteD);
                 intentVar.putExtra("difficulter",testdifficulter);
             }
         }
@@ -218,11 +254,11 @@ public class MenuActivity extends Activity {
                 .setText(Html
                         .fromHtml("<b>Objectif :<b><br>" +
                                 "<br>" +
-                                "<small>Reformer la forme presente en haut à partir de la matrice au centrale</small><br>" +
+                                "<small>Sélectionner le plus rapidement possible, le bon élément</small><br>" +
                                 "<br>" +
                                 "<b>Rules</b><br>" +
                                 "<br>" +
-                                "<small>Utilisez la matrice centrale pour deplacer les cases par des mouvements Gauche/Droite ou Haut/Bas</small>"));
+                                "<small>Cliqué sur l'élément qui n'est pas représenté sur la carte (Forme ou Couleur)</small>"));
         dialogHelp.setView(txtViewQts);
 
         dialogHelp.setPositiveButton("OK",
@@ -297,6 +333,90 @@ public class MenuActivity extends Activity {
                     }
                 });
         dialogMessScore.show();
+
+    }
+
+    class ButtonSoundClickListener implements View.OnClickListener {
+        Button btn;
+        boolean blnSound;
+
+        ButtonSoundClickListener(Button button) {
+            this.btn = button;
+        }
+
+        @Override
+        public void onClick(View v) {
+            testStateSound = !testStateSound;
+
+            if (testStateSound == true) {
+                btn.setText(R.string.bouttonSonOn);
+                monMedPlayer.start();
+                intentVar.putExtra("SOUND",testStateSound);
+            } else {
+                btn.setText(R.string.bouttonSonOff);
+                monMedPlayer.pause();
+                intentVar.putExtra("SOUND",testStateSound);
+            }
+        }
+
+    };
+
+    class ButtonVibrationClickListener implements View.OnClickListener {
+        Button btn;
+        boolean blnSound;
+
+        ButtonVibrationClickListener(Button button) {
+            this.btn = button;
+        }
+
+        @Override
+        public void onClick(View v) {
+            testStateVibration = !testStateVibration;
+
+            if (testStateVibration == true) {
+                btn.setText(R.string.bouttonVibreOn);
+                intentVar.putExtra("vibration", testStateVibration);
+            } else {
+                btn.setText(R.string.bouttonVibreOff);
+                intentVar.putExtra("vibration", testStateVibration);
+            }
+        }
+
+    };
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (testStateSound == true) {
+            monMedPlayer.start();
+        }
+
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (testStateSound) {
+            monMedPlayer.pause();
+        }
+
 
     }
 

@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.util.Log;
@@ -18,8 +19,11 @@ public class SpeedReflexActivity extends Activity {
 
     SpeedReflexView srView;
     public int difficulter;
+    public boolean vibration;
     MatricesDataSource database =null;
     Intent intentDataPlayer=null;
+    public boolean sound;
+    public MediaPlayer monMedPlayer;
 
 
     @Override
@@ -31,6 +35,17 @@ public class SpeedReflexActivity extends Activity {
 
         Bundle niveau= this.getIntent().getExtras();
         difficulter=niveau.getInt("difficulter");
+        vibration=niveau.getBoolean("vibration");
+        sound=niveau.getBoolean("SOUND");
+
+
+        monMedPlayer = MediaPlayer.create(this.getBaseContext(), R.raw.ambiance);
+        monMedPlayer.setLooping(true);
+        if (sound){
+            monMedPlayer.start();
+        }else{
+            monMedPlayer.pause();
+        }
 
 
         intentDataPlayer = new Intent(this,ActivityDatasPlayer.class);
@@ -43,6 +58,8 @@ public class SpeedReflexActivity extends Activity {
         srView.parentActivity=this;
         Log.i("avt set difficulter:"," "+difficulter);
         srView.setDificulter(difficulter);
+        srView.setVibration(vibration);
+        srView.setSound(sound);
         if(niveau.getBoolean("NEW")){
             srView.deleteSave();
         }else{
@@ -67,6 +84,10 @@ public class SpeedReflexActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        sound=srView.getSound();
+        if(sound){
+            monMedPlayer.start();
+        }
         srView.initparameters();
         srView.setThread(true);
     }
@@ -75,15 +96,21 @@ public class SpeedReflexActivity extends Activity {
     protected void onPause() {
         super.onPause();
         //srView.deleteSave();
-        Log.i("OnPause "," SaveGame");
+        Log.i("OnPause ", " SaveGame");
         srView.saveGame();
         srView.setThread(false);
+
+        if (sound) {
+            monMedPlayer.pause();
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        //srView.deleteSave();
+        if (sound) {
+            monMedPlayer.pause();
+        }
     }
 
 
