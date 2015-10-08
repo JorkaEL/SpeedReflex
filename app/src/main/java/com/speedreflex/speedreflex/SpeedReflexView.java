@@ -186,7 +186,7 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         carte4 = BitmapFactory.decodeResource(speedReflexRes,R.drawable._4_lunette_verte_telephone_rose);
         carte5 = BitmapFactory.decodeResource(speedReflexRes,R.drawable._5_ours_rouge_telephone_noire);
         carte6 = BitmapFactory.decodeResource(speedReflexRes,R.drawable._6_voiture_rose_lunette_noire);
-        carte7 = BitmapFactory.decodeResource(speedReflexRes,R.drawable._6_voiture_rose_lunette_noire);
+        carte7 = BitmapFactory.decodeResource(speedReflexRes,R.drawable._7_ours_noire_bonbon_vert);
         carte8 = BitmapFactory.decodeResource(speedReflexRes,R.drawable._8_lunette_marron_telephone_rouge);
         carte9 = BitmapFactory.decodeResource(speedReflexRes,R.drawable._9_bonbon_noire_ours_rouge);
         carte10 = BitmapFactory.decodeResource(speedReflexRes,R.drawable._10_lunette_rose_voiture_marron);
@@ -196,7 +196,7 @@ public class SpeedReflexView extends SurfaceView implements View.OnClickListener
         carte14 = BitmapFactory.decodeResource(speedReflexRes,R.drawable._14_voiture_marron_telephone_rose);
         carte15 = BitmapFactory.decodeResource(speedReflexRes,R.drawable._15_ours_rouge_bonbon_vert);
         carte16 = BitmapFactory.decodeResource(speedReflexRes,R.drawable._16_voiture_noire_lunette_rose);
-        carte17 = BitmapFactory.decodeResource(speedReflexRes,R.drawable._17_ours_vert_bonbon_noire);
+        carte17 = BitmapFactory.decodeResource(speedReflexRes,R.drawable._17_ours_vert_bonbon_noire_bis);
         carte18 = BitmapFactory.decodeResource(speedReflexRes,R.drawable._18_lunette_rouge_telephone_marron);
         carte19 = BitmapFactory.decodeResource(speedReflexRes,R.drawable._19_ours_rose_telephone_rouge);
         carte20 = BitmapFactory.decodeResource(speedReflexRes,R.drawable._20_ours_rose_voiture_verte);
