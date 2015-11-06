@@ -199,7 +199,7 @@ public class MenuActivity extends Activity {
         txtViewQts.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
                 ViewGroup.LayoutParams.FILL_PARENT));
         txtViewQts.setPadding(20, 10, 20, 10);
-        txtViewQts.setTextColor(Color.WHITE);
+        txtViewQts.setTextColor(Color.BLACK);
         txtViewQts.setTextSize(20);
         txtViewQts
                 .setText(Html
@@ -245,7 +245,7 @@ public class MenuActivity extends Activity {
                 ViewGroup.LayoutParams.FILL_PARENT));
         txtViewQts.setPadding(20, 10, 20, 10);
         txtViewQts.setTextSize(20);
-        txtViewQts.setTextColor(Color.WHITE);
+        txtViewQts.setTextColor(Color.BLACK);
 
         //txtViewQts.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
         txtViewQts.setMovementMethod(new ScrollingMovementMethod());
@@ -304,7 +304,7 @@ public class MenuActivity extends Activity {
                 ViewGroup.LayoutParams.FILL_PARENT));
         txtViewQts.setPadding(20, 10, 20, 10);
         txtViewQts.setTextSize(20);
-        txtViewQts.setTextColor(Color.WHITE);
+        txtViewQts.setTextColor(Color.BLACK);
 
         txtViewQts.setMovementMethod(new ScrollingMovementMethod());
 
